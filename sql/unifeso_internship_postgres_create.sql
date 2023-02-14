@@ -1,4 +1,4 @@
-CREATE TABLE "public.users" (
+CREATE TABLE "users" (
 	"id" serial NOT NULL,
 	"name" TEXT NOT NULL,
 	"email" TEXT NOT NULL,
@@ -8,13 +8,9 @@ CREATE TABLE "public.users" (
 	"student_status_id" integer,
 	"documentation_ok" BOOLEAN,
 	CONSTRAINT "users_pk" PRIMARY KEY ("id")
-) WITH (
-  OIDS=FALSE
-);
+) WITH (OIDS = FALSE);
 
-
-
-CREATE TABLE "public.classes" (
+CREATE TABLE "classes" (
 	"id" serial NOT NULL,
 	"name" TEXT NOT NULL,
 	"is_active" BOOLEAN NOT NULL,
@@ -24,23 +20,15 @@ CREATE TABLE "public.classes" (
 	"number_reports" integer NOT NULL,
 	"class_code" TEXT NOT NULL,
 	CONSTRAINT "classes_pk" PRIMARY KEY ("id")
-) WITH (
-  OIDS=FALSE
-);
+) WITH (OIDS = FALSE);
 
-
-
-CREATE TABLE "public.user_types" (
+CREATE TABLE "user_types" (
 	"id" serial NOT NULL,
 	"name" TEXT NOT NULL UNIQUE,
 	CONSTRAINT "user_types_pk" PRIMARY KEY ("id")
-) WITH (
-  OIDS=FALSE
-);
+) WITH (OIDS = FALSE);
 
-
-
-CREATE TABLE "public.reports" (
+CREATE TABLE "reports" (
 	"id" serial NOT NULL,
 	"student_id" integer NOT NULL,
 	"class_id" integer NOT NULL,
@@ -52,78 +40,77 @@ CREATE TABLE "public.reports" (
 	"last_version_sent" TEXT NOT NULL,
 	"due_date" DATE NOT NULL,
 	CONSTRAINT "reports_pk" PRIMARY KEY ("id")
-) WITH (
-  OIDS=FALSE
-);
+) WITH (OIDS = FALSE);
 
-
-
-CREATE TABLE "public.status" (
+CREATE TABLE "status" (
 	"id" serial NOT NULL,
 	"name" TEXT NOT NULL UNIQUE,
 	CONSTRAINT "status_pk" PRIMARY KEY ("id")
-) WITH (
-  OIDS=FALSE
-);
+) WITH (OIDS = FALSE);
 
-
-
-CREATE TABLE "public.internships" (
+CREATE TABLE "internships" (
 	"id" serial NOT NULL,
-	"company_id" TEXT NOT NULL,
+	"company_id" integer NOT NULL,
 	"student_id" integer NOT NULL,
 	"start_date" DATE NOT NULL,
 	"end_date" DATE NOT NULL,
 	"weekly_hours" integer NOT NULL,
 	CONSTRAINT "internships_pk" PRIMARY KEY ("id")
-) WITH (
-  OIDS=FALSE
-);
+) WITH (OIDS = FALSE);
 
-
-
-CREATE TABLE "public.companies" (
+CREATE TABLE "companies" (
 	"id" serial NOT NULL,
 	"name" TEXT NOT NULL,
 	CONSTRAINT "companies_pk" PRIMARY KEY ("id")
-) WITH (
-  OIDS=FALSE
-);
+) WITH (OIDS = FALSE);
 
-
-
-CREATE TABLE "public.student_status" (
+CREATE TABLE "student_status" (
 	"id" serial NOT NULL,
 	"name" TEXT NOT NULL,
 	CONSTRAINT "student_status_pk" PRIMARY KEY ("id")
-) WITH (
-  OIDS=FALSE
-);
+) WITH (OIDS = FALSE);
 
+ALTER TABLE
+	"users"
+ADD
+	CONSTRAINT "users_fk0" FOREIGN KEY ("user_type_id") REFERENCES "user_types"("id");
 
+ALTER TABLE
+	"users"
+ADD
+	CONSTRAINT "users_fk1" FOREIGN KEY ("class_id") REFERENCES "classes"("id");
 
-ALTER TABLE "users" ADD CONSTRAINT "users_fk0" FOREIGN KEY ("class_id") REFERENCES "classes"("id");
-ALTER TABLE "users" ADD CONSTRAINT "users_fk1" FOREIGN KEY ("student_status_id") REFERENCES "student_status"("id");
+ALTER TABLE
+	"users"
+ADD
+	CONSTRAINT "users_fk2" FOREIGN KEY ("student_status_id") REFERENCES "student_status"("id");
 
+ALTER TABLE
+	"reports"
+ADD
+	CONSTRAINT "reports_fk0" FOREIGN KEY ("student_id") REFERENCES "users"("id");
 
-ALTER TABLE "user_types" ADD CONSTRAINT "user_types_fk0" FOREIGN KEY ("id") REFERENCES "users"("user_type_id");
+ALTER TABLE
+	"reports"
+ADD
+	CONSTRAINT "reports_fk1" FOREIGN KEY ("class_id") REFERENCES "classes"("id");
 
-ALTER TABLE "reports" ADD CONSTRAINT "reports_fk0" FOREIGN KEY ("student_id") REFERENCES "users"("id");
-ALTER TABLE "reports" ADD CONSTRAINT "reports_fk1" FOREIGN KEY ("class_id") REFERENCES "classes"("id");
-ALTER TABLE "reports" ADD CONSTRAINT "reports_fk2" FOREIGN KEY ("internship_id") REFERENCES "internships"("id");
-ALTER TABLE "reports" ADD CONSTRAINT "reports_fk3" FOREIGN KEY ("status_id") REFERENCES "status"("id");
+ALTER TABLE
+	"reports"
+ADD
+	CONSTRAINT "reports_fk2" FOREIGN KEY ("internship_id") REFERENCES "internships"("id");
 
+ALTER TABLE
+	"reports"
+ADD
+	CONSTRAINT "reports_fk3" FOREIGN KEY ("status_id") REFERENCES "status"("id");
 
-ALTER TABLE "internships" ADD CONSTRAINT "internships_fk0" FOREIGN KEY ("company_id") REFERENCES "companies"("id");
-ALTER TABLE "internships" ADD CONSTRAINT "internships_fk1" FOREIGN KEY ("student_id") REFERENCES "users"("id");
+ALTER TABLE
+	"internships"
+ADD
+	CONSTRAINT "internships_fk0" FOREIGN KEY ("company_id") REFERENCES "companies"("id");
 
-
-
-
-
-
-
-
-
-
-
+ALTER TABLE
+	"internships"
+ADD
+	CONSTRAINT "internships_fk1" FOREIGN KEY ("student_id") REFERENCES "users"("id");

@@ -1,0 +1,90 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model classes {
+  id             Int       @id(map: "classes_pk") @default(autoincrement())
+  name           String
+  is_active      Boolean
+  start_date     DateTime  @db.Date
+  end_date       DateTime? @db.Date
+  periodicity    Int
+  number_reports Int
+  class_code     String
+  reports        reports[]
+  users          users[]
+}
+
+model companies {
+  id          Int           @id(map: "companies_pk") @default(autoincrement())
+  name        String
+  internships internships[]
+}
+
+model internships {
+  id           Int       @id(map: "internships_pk") @default(autoincrement())
+  company_id   Int
+  student_id   Int
+  start_date   DateTime  @db.Date
+  end_date     DateTime  @db.Date
+  weekly_hours Int
+  companies    companies @relation(fields: [company_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "internships_fk0")
+  users        users     @relation(fields: [student_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "internships_fk1")
+  reports      reports[]
+}
+
+model reports {
+  id                Int         @id(map: "reports_pk") @default(autoincrement())
+  student_id        Int
+  class_id          Int
+  is_delivered      Boolean
+  report_number     Int
+  internship_id     Int
+  status_id         Int
+  delivery_date     DateTime?   @db.Date
+  last_version_sent String
+  due_date          DateTime    @db.Date
+  users             users       @relation(fields: [student_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "reports_fk0")
+  classes           classes     @relation(fields: [class_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "reports_fk1")
+  internships       internships @relation(fields: [internship_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "reports_fk2")
+  report_status     report_status      @relation(fields: [status_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "reports_fk3")
+}
+
+model report_status {
+  id      Int       @id(map: "status_pk") @default(autoincrement())
+  name    String    @unique
+  reports reports[]
+}
+
+model student_status {
+  id    Int     @id(map: "student_status_pk") @default(autoincrement())
+  name  String
+  users users[]
+}
+
+model user_types {
+  id    Int     @id(map: "user_types_pk") @default(autoincrement())
+  name  String  @unique
+  users users[]
+}
+
+model users {
+  id                Int             @id(map: "users_pk") @default(autoincrement())
+  name              String
+  email             String
+  password          String
+  user_type_id      Int
+  class_id          Int?
+  student_status_id Int?
+  documentation_ok  Boolean?
+  internships       internships[]
+  reports           reports[]
+  user_types        user_types      @relation(fields: [user_type_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "users_fk0")
+  classes           classes?        @relation(fields: [class_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "users_fk1")
+  student_status    student_status? @relation(fields: [student_status_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "users_fk2")
+}
