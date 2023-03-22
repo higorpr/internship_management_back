@@ -13,9 +13,9 @@ model classes {
   is_active      Boolean
   start_date     DateTime  @db.Date
   end_date       DateTime? @db.Date
-  periodicity    Int
   number_reports Int
   class_code     String
+  background_color String
   reports        reports[]
   users          users[]
 }
@@ -81,7 +81,7 @@ model users {
   user_type_id      Int
   class_id          Int?
   student_status_id Int?
-  documentation_ok  Boolean?
+  documentation_ok  Boolean
   internships       internships[]
   reports           reports[]
   user_types        user_types      @relation(fields: [user_type_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "users_fk0")

@@ -10,36 +10,54 @@ async function main() {
 	];
 	const studentStatuses = ["ENROLLED", "APPROVED", "REPROVED"];
 
+	const userTypes = ["PROFESSOR", "STUDENT"];
+
 	reportStatuses.forEach(async (reportStatus) => {
-		let report_event = await prisma.report_status.findFirst({
+		const report_event = await prisma.report_status.findFirst({
 			where: {
 				name: reportStatus,
 			},
 		});
 		if (!report_event) {
-			report_event = await prisma.report_status.create({
+			const report_event_new = await prisma.report_status.create({
 				data: {
 					name: reportStatus,
 				},
 			});
+			console.log(report_event_new);
 		}
-		console.log(report_event);
 	});
 
 	studentStatuses.forEach(async (studentStatus) => {
-		let student_event = await prisma.student_status.findFirst({
+		const student_event = await prisma.student_status.findFirst({
 			where: {
 				name: studentStatus,
 			},
 		});
 		if (!student_event) {
-			student_event = await prisma.student_status.create({
+			const student_event_new = await prisma.student_status.create({
 				data: {
 					name: studentStatus,
 				},
 			});
+			console.log(student_event_new);
+		}
+	});
 
-			console.log(student_event);
+	userTypes.forEach(async (userType) => {
+		const type_user = await prisma.user_types.findFirst({
+			where: {
+				name: userType,
+			},
+		});
+
+		if (!type_user) {
+			const type = await prisma.user_types.create({
+				data: {
+					name: userType,
+				},
+			});
+			console.log(type);
 		}
 	});
 }
