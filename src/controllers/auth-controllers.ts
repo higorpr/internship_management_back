@@ -2,17 +2,22 @@ import { Response, Request } from "express";
 import { authService } from "../services/auth-service";
 
 export async function signUp(req: Request, res: Response) {
-	// recebe um body com:
-	// nome, email, senha, confirmação de senha
-	// checa se o usuário é professor ou aluno a partir do email
-	//
 	const { name, email, password } = req.body;
 	try {
-		const user = await authService.createUser(name, email, password);
-		return res.status(201).send(user);
+		await authService.createUser(name, email, password);
+		return res.sendStatus(201);
 	} catch (err) {
-		console.log(err);
+		return res.status(err.status).send(err.message);
 	}
 }
 
-// export async function login(req: Request, res: Response) {}
+export async function login(req: Request, res: Response) {
+	const { email, password } = req.body;
+
+	try {
+		const token = await authService.login(email, password);
+		return res.status(200).send(token);
+	} catch (err) {
+		return res.status(err.status).send(err.message);
+	}
+}
