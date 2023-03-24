@@ -73,7 +73,7 @@ async function validatePassword(password: string, hashPassword: string) {
 }
 
 function createSession(userId: number) {
-	const token = jwt.sign({ id: userId }, process.env.JWT_SECRET, {
+	const token = jwt.sign({ userId: userId }, process.env.JWT_SECRET, {
 		expiresIn: 86400,
 	}); // token will expire in 1 day
 	return token;
