@@ -6,9 +6,11 @@
 	"main": "index.js",
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
-		"dev": "npx nodemon src/server.ts",
+		"dev": "nodemon src/server.ts",
 		"seed": "npx prisma db seed",
-		"studio": "npx prisma studio"
+		"studio": "npx prisma studio",
+		"build" : "tsc",
+		"start" : "node dist/src/server.js"
 	},
 	"repository": {
 		"type": "git",
