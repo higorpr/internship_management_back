@@ -1,10 +1,32 @@
-import { users, user_types } from "@prisma/client";
+import { classes, student_status, users, user_types } from "@prisma/client";
 import { prisma } from "../../config/db";
+import { UserType } from "../classroom-repository";
 
-async function getUserByEmail(email: string): Promise<users> {
+export type UserReturn = {
+	id: number;
+	name: string;
+	email: string;
+	password: string;
+	user_types: user_types;
+	classes: classes;
+	student_status: student_status;
+	documentation_ok: boolean;
+};
+
+async function getUserByEmail(email: string): Promise<UserReturn> {
 	return await prisma.users.findFirst({
 		where: {
 			email: email,
+		},
+		select: {
+			id: true,
+			name: true,
+			email: true,
+			password: true,
+			user_types: true,
+			classes: true,
+			student_status: true,
+			documentation_ok: true,
 		},
 	});
 }

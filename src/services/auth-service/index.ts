@@ -51,9 +51,11 @@ async function login(email: string, password: string) {
 
 	await validatePassword(password, hashPassword); // Compare sent password to hashed password
 
+	delete user.password; // remove password from object sent to user
+
 	const token = createSession(user.id); // Generate token based on userId
 
-	return token; // Send token to controller
+	return { user, token }; // Send user info to user
 }
 
 async function getUserInfoByEmail(email: string) {
