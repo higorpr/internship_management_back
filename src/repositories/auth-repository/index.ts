@@ -1,8 +1,7 @@
 import { classes, student_status, users, user_types } from "@prisma/client";
 import { prisma } from "../../config/db";
-import { UserType } from "../classroom-repository";
 
-export type UserReturn = {
+type UserReturn = {
 	id: number;
 	name: string;
 	email: string;

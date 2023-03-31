@@ -8,16 +8,24 @@ datasource db {
 }
 
 model classes {
-  id             Int       @id(map: "classes_pk") @default(autoincrement())
-  name           String
-  is_active      Boolean
-  start_date     DateTime  @db.Date
-  end_date       DateTime? @db.Date
-  number_reports Int
-  class_code     String
+  id               Int        @id(map: "classes_pk") @default(autoincrement())
+  name             String
+  is_active        Boolean
+  start_date       DateTime   @db.Date
+  end_date         DateTime   @db.Date
+  class_code       String
   background_color String
-  reports        reports[]
-  users          users[]
+  class_type_id    Int
+  class_type       class_type @relation(fields: [class_type_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "classes_fk1")
+  reports          reports[]
+  users            users[]
+}
+
+model class_type {
+  id      Int       @id(map: "class_type_pk") @default(autoincrement())
+  name    String
+  number_reports Int?
+  classes classes[]
 }
 
 model companies {
@@ -39,20 +47,20 @@ model internships {
 }
 
 model reports {
-  id                Int         @id(map: "reports_pk") @default(autoincrement())
+  id                Int           @id(map: "reports_pk") @default(autoincrement())
   student_id        Int
   class_id          Int
   is_delivered      Boolean
   report_number     Int
   internship_id     Int
   status_id         Int
-  delivery_date     DateTime?   @db.Date
+  delivery_date     DateTime?     @db.Date
   last_version_sent String
-  due_date          DateTime    @db.Date
-  users             users       @relation(fields: [student_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "reports_fk0")
-  classes           classes     @relation(fields: [class_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "reports_fk1")
-  internships       internships @relation(fields: [internship_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "reports_fk2")
-  report_status     report_status      @relation(fields: [status_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "reports_fk3")
+  due_date          DateTime      @db.Date
+  users             users         @relation(fields: [student_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "reports_fk0")
+  classes           classes       @relation(fields: [class_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "reports_fk1")
+  internships       internships   @relation(fields: [internship_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "reports_fk2")
+  report_status     report_status @relation(fields: [status_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "reports_fk3")
 }
 
 model report_status {

@@ -12,6 +12,8 @@ async function main() {
 
 	const userTypes = ["PROFESSOR", "STUDENT"];
 
+	const classesTypes = ["MANDATORY_INTERNSHIP", "REC"];
+
 	reportStatuses.forEach(async (reportStatus) => {
 		const report_event = await prisma.report_status.findFirst({
 			where: {
@@ -55,6 +57,26 @@ async function main() {
 			const type = await prisma.user_types.create({
 				data: {
 					name: userType,
+				},
+			});
+			console.log(type);
+		}
+	});
+
+	classesTypes.forEach(async (classType) => {
+		const class_type = await prisma.class_type.findFirst({
+			where: {
+				name: classType,
+			},
+		});
+
+		const nReports = 3;
+
+		if (!class_type) {
+			const type = await prisma.class_type.create({
+				data: {
+					name: classType,
+					number_reports: nReports,
 				},
 			});
 			console.log(type);
