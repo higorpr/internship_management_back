@@ -8,24 +8,24 @@ datasource db {
 }
 
 model classes {
-  id               Int        @id(map: "classes_pk") @default(autoincrement())
+  id               Int          @id(map: "classes_pk") @default(autoincrement())
   name             String
   is_active        Boolean
-  start_date       DateTime   @db.Date
-  end_date         DateTime   @db.Date
+  start_date       DateTime     @db.Date
+  end_date         DateTime     @db.Date
   class_code       String
   background_color String
   class_type_id    Int
-  class_type       class_type @relation(fields: [class_type_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "classes_fk1")
+  class_type       class_type   @relation(fields: [class_type_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "classes_fk1")
   reports          reports[]
-  users            users[]
+  user_class       user_class[]
 }
 
 model class_type {
-  id      Int       @id(map: "class_type_pk") @default(autoincrement())
-  name    String
+  id             Int       @id(map: "class_type_pk") @default(autoincrement())
+  name           String
   number_reports Int?
-  classes classes[]
+  classes        classes[]
 }
 
 model companies {
@@ -87,12 +87,19 @@ model users {
   email             String
   password          String
   user_type_id      Int
-  class_id          Int?
   student_status_id Int?
   documentation_ok  Boolean
   internships       internships[]
   reports           reports[]
+  user_class        user_class[]
   user_types        user_types      @relation(fields: [user_type_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "users_fk0")
-  classes           classes?        @relation(fields: [class_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "users_fk1")
   student_status    student_status? @relation(fields: [student_status_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "users_fk2")
+}
+
+model user_class {
+  id       Int     @id @default(autoincrement())
+  user_id  Int
+  class_id Int
+  classes  classes @relation(fields: [class_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  users    users   @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }

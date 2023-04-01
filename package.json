@@ -11,7 +11,8 @@
 		"studio": "npx prisma studio",
 		"build": "tsc",
 		"start": "node dist/src/server.js",
-		"dev:migration:run": "npx prisma migrate"
+		"db:pull":"npx prisma db pull", 
+		"dev:migration:run": "npx prisma migrate dev"
 	},
 	"repository": {
 		"type": "git",
