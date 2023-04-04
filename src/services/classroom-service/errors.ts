@@ -23,3 +23,27 @@ export function sameClassNameError(): ApplicationError {
 		status: 409,
 	};
 }
+
+export function inactiveClassError(): ApplicationError {
+	return {
+		name: "Inactive Class Error",
+		message: "A turma está inativa",
+		status: 404,
+	};
+}
+
+export function inexistentClassError(): ApplicationError {
+	return {
+		name: "Inexistent Class Error",
+		message: "Não há turmas com esse código",
+		status: 404,
+	};
+}
+
+export function studentAlreadyEnrolledError(): ApplicationError {
+	return {
+		name: "Student Already Enrolled Error",
+		message: "O aluno já está matriculado nessa turma",
+		status: 409,
+	};
+}

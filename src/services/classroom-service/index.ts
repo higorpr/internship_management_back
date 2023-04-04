@@ -1,10 +1,14 @@
 import { classes } from "@prisma/client";
 import { nanoid } from "nanoid";
 import { classroomRepository } from "../../repositories/classroom-repository";
+import { userRepository } from "../../repositories/user-repository";
 import {
 	frontEndBadRequestError,
+	inactiveClassError,
+	inexistentClassError,
 	mustBeTeacherError,
 	sameClassNameError,
+	studentAlreadyEnrolledError,
 } from "./errors";
 
 async function getAllClasses(): Promise<classes[]> {
@@ -71,4 +75,57 @@ async function getClassTypeId(classType: string): Promise<number> {
 	return id;
 }
 
-export const classroomService = { getAllClasses, teacherCheck, createNewClass };
+async function getClassInfoFromCode(classCode: string): Promise<classes> {
+	const classInfo = await classroomRepository.getClassByCode(classCode);
+	if (!classInfo) {
+		throw inexistentClassError();
+	}
+
+	if (classInfo.is_active === false) {
+		throw inactiveClassError();
+	}
+
+	return classInfo;
+}
+
+async function isAlreadyEnrolled(userId: number, classId: number) {
+	const enrollmentCheck = await userRepository.getIfStudentIsEnrolled(
+		userId,
+		classId
+	);
+
+	if (enrollmentCheck) {
+		return true;
+	}
+
+	return false;
+}
+
+async function enrollStudent(userId: number, classCode: string) {
+	const enrolledStatusId = await userRepository.getStatusIdFromName(
+		"ENROLLED"
+	);
+	const classInfo = await getClassInfoFromCode(classCode);
+
+	const classId = classInfo.id;
+
+	if (isAlreadyEnrolled(userId, classId)) {
+		throw studentAlreadyEnrolledError();
+	}
+
+	await userRepository.createStudentHistory(userId, classId);
+
+	const enrolledStudent = await userRepository.updateStudentStatus(
+		userId,
+		enrolledStatusId
+	);
+
+	return enrolledStudent;
+}
+
+export const classroomService = {
+	getAllClasses,
+	teacherCheck,
+	createNewClass,
+	enrollStudent,
+};

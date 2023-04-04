@@ -41,3 +41,24 @@ export async function postClass(req: AuthenticatedRequest, res: Response) {
 		return res.status(500).send(err);
 	}
 }
+
+export async function enrollNewStudent(
+	req: AuthenticatedRequest,
+	res: Response
+) {
+	const { classCode } = req.body;
+	const userId = req.userId;
+
+	try {
+		const newStudent = await classroomService.enrollStudent(
+			userId,
+			classCode
+		);
+		return res.status(201).send(newStudent);
+	} catch (err) {
+		if (err.name === "Student Already Enrolled Error") {
+			return res.status(err.status).send(err.message);
+		}
+		return res.status(500).send(err);
+	}
+}

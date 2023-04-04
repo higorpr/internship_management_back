@@ -1,5 +1,9 @@
 import { Router } from "express";
-import { getAllClasses, postClass } from "../controllers/classroom-controllers";
+import {
+	enrollNewStudent,
+	getAllClasses,
+	postClass,
+} from "../controllers/classroom-controllers";
 import { authentication } from "../middleware/auth-middleware";
 
 const classroomRouter = Router();
@@ -7,6 +11,7 @@ const classroomRouter = Router();
 classroomRouter
 	.all("/*", authentication)
 	.get("/all", getAllClasses)
-	.post("/new", postClass);
+	.post("/new", postClass)
+	.post("/newStudent", enrollNewStudent);
 
 export { classroomRouter };
