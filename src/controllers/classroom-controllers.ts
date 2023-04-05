@@ -1,6 +1,8 @@
 import { AuthenticatedRequest } from "../middleware/auth-middleware";
 import { Response } from "express";
 import { classroomService } from "../services/classroom-service";
+import { userRouter } from "../routers";
+import { userService } from "../services/user-service";
 
 export async function getAllClasses(req: AuthenticatedRequest, res: Response) {
 	const userId = req.userId;
@@ -67,4 +69,26 @@ export async function enrollNewStudent(
 		}
 		return res.status(500).send(err);
 	}
+}
+
+export async function getStudentClasses(
+	req: AuthenticatedRequest,
+	res: Response
+) {
+	const userId = req.userId;
+	try {
+		const classIds = await userService.getStudentClassIds(userId);
+
+		const studentClasses = await classroomService.getClassesByIdList(
+			classIds
+		);
+
+		return res.status(200).send(studentClasses);
+	} catch (err) {
+		if (err.name === "Unenrolled Student Error") {
+			return res.status(err.status).send(err.message);
+		}
+	}
+
+	return res.status(200);
 }

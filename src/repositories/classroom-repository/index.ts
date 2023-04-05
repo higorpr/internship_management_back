@@ -71,6 +71,14 @@ async function getClassByCode(classCode: string): Promise<classes> {
 	});
 }
 
+async function getStudentClassesInfo(idList: number[]): Promise<classes[]> {
+	return await prisma.classes.findMany({
+		where: {
+			id: { in: idList },
+		},
+	});
+}
+
 export const classroomRepository = {
 	getAllClasses,
 	getUserType,
@@ -78,4 +86,5 @@ export const classroomRepository = {
 	getClassTypeIdByName,
 	getClassByName,
 	getClassByCode,
+	getStudentClassesInfo,
 };

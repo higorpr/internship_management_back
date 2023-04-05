@@ -30,8 +30,7 @@ async function createNewClass(
 	startDate: Date,
 	endDate: Date,
 	classType: string
-) {
-	// className, startDate, endDate,classCode, backgroundColor, classTypeId
+): Promise<classes> {
 	const classCode: string = createRandomClassCode();
 	const classTypeId = await getClassTypeId(classType);
 	if (!classTypeId) {
@@ -64,7 +63,7 @@ async function repeatedClassName(className: string) {
 	return false;
 }
 
-function createRandomClassCode() {
+function createRandomClassCode(): string {
 	const code = nanoid(6);
 	return code;
 }
@@ -121,9 +120,18 @@ async function enrollStudent(
 	return { classId: classInfo.id, className: classInfo.name };
 }
 
+async function getClassesByIdList(idList: number[]): Promise<classes[]> {
+	const studentClasses = await classroomRepository.getStudentClassesInfo(
+		idList
+	);
+
+	return studentClasses;
+}
+
 export const classroomService = {
 	getAllClasses,
 	teacherCheck,
 	createNewClass,
 	enrollStudent,
+	getClassesByIdList,
 };

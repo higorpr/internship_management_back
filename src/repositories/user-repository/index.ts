@@ -30,7 +30,7 @@ async function createStudentHistory(
 
 async function getIfStudentIsEnrolled(userId: number, classId: number) {
 	const enrolledId = await getStatusIdFromName("ENROLLED");
-	
+
 	return await prisma.user_class.findFirst({
 		where: {
 			user_id: userId,
@@ -40,8 +40,17 @@ async function getIfStudentIsEnrolled(userId: number, classId: number) {
 	});
 }
 
+async function getStudentClasses(userId: number): Promise<user_class[]> {
+	return await prisma.user_class.findMany({
+		where: {
+			user_id: userId,
+		},
+	});
+}
+
 export const userRepository = {
 	getStatusIdFromName,
 	createStudentHistory,
 	getIfStudentIsEnrolled,
+	getStudentClasses,
 };
