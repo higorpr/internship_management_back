@@ -50,13 +50,19 @@ export async function enrollNewStudent(
 	const userId = req.userId;
 
 	try {
-		const newStudent = await classroomService.enrollStudent(
+		const targetClass = await classroomService.enrollStudent(
 			userId,
 			classCode
 		);
-		return res.status(201).send(newStudent);
+		return res.status(201).send(targetClass);
 	} catch (err) {
 		if (err.name === "Student Already Enrolled Error") {
+			return res.status(err.status).send(err.message);
+		}
+		if (err.name === "Inactive Class Error") {
+			return res.status(err.status).send(err.message);
+		}
+		if (err.name === "Inexistent Class Error") {
 			return res.status(err.status).send(err.message);
 		}
 		return res.status(500).send(err);

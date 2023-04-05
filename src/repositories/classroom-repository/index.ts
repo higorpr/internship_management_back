@@ -1,5 +1,5 @@
 import { prisma } from "../../config/db";
-import { classes, user_class } from "@prisma/client";
+import { classes } from "@prisma/client";
 
 type UserType = { user_types: { name: string } };
 

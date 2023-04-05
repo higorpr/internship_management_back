@@ -88,7 +88,10 @@ async function getClassInfoFromCode(classCode: string): Promise<classes> {
 	return classInfo;
 }
 
-async function isAlreadyEnrolled(userId: number, classId: number) {
+async function isAlreadyEnrolled(
+	userId: number,
+	classId: number
+): Promise<boolean> {
 	const enrollmentCheck = await userRepository.getIfStudentIsEnrolled(
 		userId,
 		classId
@@ -101,26 +104,21 @@ async function isAlreadyEnrolled(userId: number, classId: number) {
 	return false;
 }
 
-async function enrollStudent(userId: number, classCode: string) {
-	const enrolledStatusId = await userRepository.getStatusIdFromName(
-		"ENROLLED"
-	);
+async function enrollStudent(
+	userId: number,
+	classCode: string
+): Promise<{ classId: number; className: string }> {
 	const classInfo = await getClassInfoFromCode(classCode);
 
 	const classId = classInfo.id;
 
-	if (isAlreadyEnrolled(userId, classId)) {
+	if (await isAlreadyEnrolled(userId, classId)) {
 		throw studentAlreadyEnrolledError();
 	}
 
 	await userRepository.createStudentHistory(userId, classId);
 
-	const enrolledStudent = await userRepository.updateStudentStatus(
-		userId,
-		enrolledStatusId
-	);
-
-	return enrolledStudent;
+	return { classId: classInfo.id, className: classInfo.name };
 }
 
 export const classroomService = {

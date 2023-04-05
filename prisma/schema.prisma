@@ -72,7 +72,7 @@ model report_status {
 model student_status {
   id    Int     @id(map: "student_status_pk") @default(autoincrement())
   name  String
-  users users[]
+  user_class user_class[]
 }
 
 model user_types {
@@ -86,20 +86,20 @@ model users {
   name              String
   email             String
   password          String
-  user_type_id      Int
-  student_status_id Int?
+  user_type_id      Int  
   documentation_ok  Boolean
   internships       internships[]
   reports           reports[]
   user_class        user_class[]
   user_types        user_types      @relation(fields: [user_type_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "users_fk0")
-  student_status    student_status? @relation(fields: [student_status_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "users_fk2")
 }
 
 model user_class {
   id       Int     @id @default(autoincrement())
   user_id  Int
   class_id Int
+  student_status_id Int?
   classes  classes @relation(fields: [class_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   users    users   @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  student_status    student_status? @relation(fields: [student_status_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "user_class_fk0")
 }
