@@ -52,14 +52,14 @@ model reports {
   class_id          Int
   is_delivered      Boolean
   report_number     Int
-  internship_id     Int
+  internship_id     Int?
   status_id         Int
   delivery_date     DateTime?     @db.Date
-  last_version_sent String
-  due_date          DateTime      @db.Date
+  last_version_sent String?
+  due_date          DateTime?      @db.Date
   users             users         @relation(fields: [student_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "reports_fk0")
   classes           classes       @relation(fields: [class_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "reports_fk1")
-  internships       internships   @relation(fields: [internship_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "reports_fk2")
+  internships       internships?   @relation(fields: [internship_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "reports_fk2")
   report_status     report_status @relation(fields: [status_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "reports_fk3")
 }
 

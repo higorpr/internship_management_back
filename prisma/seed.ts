@@ -7,6 +7,7 @@ async function main() {
 		"LATE",
 		"ACCEPTED",
 		"REFUSED",
+		"TBD",
 	];
 	const studentStatuses = ["ENROLLED", "APPROVED", "REPROVED"];
 

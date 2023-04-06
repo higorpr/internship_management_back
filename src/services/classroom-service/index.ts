@@ -1,7 +1,11 @@
 import { classes } from "@prisma/client";
 import { nanoid } from "nanoid";
-import { classroomRepository } from "../../repositories/classroom-repository";
+import {
+	classInfo,
+	classroomRepository,
+} from "../../repositories/classroom-repository";
 import { userRepository } from "../../repositories/user-repository";
+import { reportService } from "../report-service";
 import {
 	frontEndBadRequestError,
 	inactiveClassError,
@@ -74,7 +78,7 @@ async function getClassTypeId(classType: string): Promise<number> {
 	return id;
 }
 
-async function getClassInfoFromCode(classCode: string): Promise<classes> {
+async function getClassInfoFromCode(classCode: string): Promise<classInfo> {
 	const classInfo = await classroomRepository.getClassByCode(classCode);
 	if (!classInfo) {
 		throw inexistentClassError();
@@ -115,7 +119,15 @@ async function enrollStudent(
 		throw studentAlreadyEnrolledError();
 	}
 
+	// create entry at user_class table
 	await userRepository.createStudentHistory(userId, classId);
+
+	// create entry at reports table
+	await reportService.createInitialReports(
+		userId,
+		classId,
+		classInfo.class_type.number_reports
+	);
 
 	return { classId: classInfo.id, className: classInfo.name };
 }

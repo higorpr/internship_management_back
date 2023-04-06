@@ -1,5 +1,5 @@
 import { prisma } from "../../config/db";
-import { classes } from "@prisma/client";
+import { classes, class_type } from "@prisma/client";
 
 type UserType = { user_types: { name: string } };
 
@@ -63,10 +63,15 @@ async function getClassByName(className: string): Promise<{ name: string }> {
 	});
 }
 
-async function getClassByCode(classCode: string): Promise<classes> {
+export type classInfo = classes & { class_type: class_type };
+
+async function getClassByCode(classCode: string): Promise<classInfo> {
 	return await prisma.classes.findFirst({
 		where: {
 			class_code: classCode,
+		},
+		include: {
+			class_type: true,
 		},
 	});
 }
