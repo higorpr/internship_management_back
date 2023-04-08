@@ -1,7 +1,6 @@
 import { AuthenticatedRequest } from "../middleware/auth-middleware";
 import { Response } from "express";
 import { classroomService } from "../services/classroom-service";
-import { userRouter } from "../routers";
 import { userService } from "../services/user-service";
 
 export async function getAllClasses(req: AuthenticatedRequest, res: Response) {
@@ -91,4 +90,25 @@ export async function getStudentClasses(
 	}
 
 	return res.status(200);
+}
+
+export async function getSingleClassInfo(
+	req: AuthenticatedRequest,
+	res: Response
+) {
+	const { classId } = req.params;
+	
+	if (!classId) {
+		return res.status(400).send("Missing body");
+	}
+	
+
+	try {
+		const classInfo = await classroomService.getCompleteClassInfo(
+			Number(classId)
+		);
+		return res.status(200).send(classInfo);
+	} catch (err) {
+		console.log(err);
+	}
 }

@@ -84,6 +84,69 @@ async function getStudentClassesInfo(idList: number[]): Promise<classes[]> {
 	});
 }
 
+export type completeClassInfo = {
+	name: string;
+	is_active: boolean;
+	class_code: string;
+	user_class: {
+		users: {
+			id: number;
+			name: string;
+			reports: {
+				report_number: number;
+				report_status: {
+					name: string;
+				};
+			}[];
+		};
+	}[];
+	class_type: {
+		name: string;
+		number_reports: number;
+	};
+};
+
+async function getCompleteClassInfo(
+	classId: number
+): Promise<completeClassInfo> {
+	return await prisma.classes.findUnique({
+		where: {
+			id: classId,
+		},
+		select: {
+			name: true,
+			is_active: true,
+			class_code: true,
+			class_type: {
+				select: {
+					name: true,
+					number_reports: true,
+				},
+			},
+			user_class: {
+				select: {
+					users: {
+						select: {
+							id: true,
+							name: true,
+							reports: {
+								select: {
+									report_number: true,
+									report_status: {
+										select: {
+											name: true,
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	});
+}
+
 export const classroomRepository = {
 	getAllClasses,
 	getUserType,
@@ -92,4 +155,5 @@ export const classroomRepository = {
 	getClassByName,
 	getClassByCode,
 	getStudentClassesInfo,
+	getCompleteClassInfo,
 };

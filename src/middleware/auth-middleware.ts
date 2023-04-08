@@ -33,6 +33,6 @@ export async function authentication(
 	} catch (err) {
 		return res.status(401).send("Invalid Token");
 	}
-    
+
 	next();
 }

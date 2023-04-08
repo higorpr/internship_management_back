@@ -3,6 +3,7 @@ import { nanoid } from "nanoid";
 import {
 	classInfo,
 	classroomRepository,
+	completeClassInfo,
 } from "../../repositories/classroom-repository";
 import { userRepository } from "../../repositories/user-repository";
 import { reportService } from "../report-service";
@@ -140,10 +141,55 @@ async function getClassesByIdList(idList: number[]): Promise<classes[]> {
 	return studentClasses;
 }
 
+function formatClassInfo(classInfo: completeClassInfo) {
+	const formattedClassInfo = { ...classInfo };
+
+	const studentReportInfo = classInfo.user_class.map((studentInfo) => {
+		const studentId = studentInfo.users.id;
+		const studentName = studentInfo.users.name;
+		let reportOneStatus = "";
+		let reportTwoStatus = "";
+		let reportThreeStatus = "";
+		studentInfo.users.reports.forEach((report) => {
+			if (report.report_number === 1) {
+				reportOneStatus = report.report_status.name;
+			}
+
+			if (report.report_number === 2) {
+				reportTwoStatus = report.report_status.name;
+			}
+
+			if (report.report_number === 3) {
+				reportThreeStatus = report.report_status.name;
+			}
+		});
+		return {
+			studentId,
+			studentName,
+			reportOneStatus,
+			reportTwoStatus,
+			reportThreeStatus,
+		};
+	});
+
+	delete formattedClassInfo.user_class;
+	formattedClassInfo["students"] = studentReportInfo;
+	return formattedClassInfo;
+}
+
+async function getCompleteClassInfo(classId: number) {
+	const classInfo = await classroomRepository.getCompleteClassInfo(classId);
+
+	const formattedClassInfo = formatClassInfo(classInfo);
+
+	return formattedClassInfo;
+}
+
 export const classroomService = {
 	getAllClasses,
 	teacherCheck,
 	createNewClass,
 	enrollStudent,
 	getClassesByIdList,
+	getCompleteClassInfo,
 };
