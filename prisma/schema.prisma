@@ -39,7 +39,6 @@ model internships {
   company_id   Int
   student_id   Int
   start_date   DateTime  @db.Date
-  end_date     DateTime  @db.Date
   weekly_hours Int
   companies    companies @relation(fields: [company_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "internships_fk0")
   users        users     @relation(fields: [student_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "internships_fk1")

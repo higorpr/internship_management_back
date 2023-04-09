@@ -1,4 +1,7 @@
-import { userRepository } from "../../repositories/user-repository";
+import {
+	StudentInClassData,
+	userRepository,
+} from "../../repositories/user-repository";
 import {
 	inexistantUserError,
 	mustBeStudentError,
@@ -57,8 +60,44 @@ async function getStudentDataOnClass(studentId: number, classId: number) {
 		studentId,
 		classId
 	);
+	const formData = formatStudentClassData(studentData);
+	console.log(formData);
 
 	return studentData;
+}
+
+function formatStudentClassData(unformattedData: StudentInClassData) {
+	const formattedData = { ...unformattedData };
+	const reportObj = {};
+	unformattedData.reports.forEach((reportData) => {
+		let reportOrder = "";
+		if (reportData.report_number === 1) {
+			reportOrder = "firstReport";
+		}
+		if (reportData.report_number === 2) {
+			reportOrder = "secondReport";
+		}
+		if (reportData.report_number === 3) {
+			reportOrder = "thirdReport";
+		}
+		reportObj[reportOrder] = {
+			deliveredDate: reportData.delivery_date,
+			dueDate: reportData.due_date,
+			reportStatus: reportData.report_status.name,
+		};
+	});
+	const userData = {
+		studentName: unformattedData.name,
+		studentStatus: unformattedData.user_class[0].student_status.name,
+	};
+
+	delete formattedData.reports;
+	delete formattedData.name;
+	delete formattedData.user_class;
+	formattedData["studentInfo"] = userData;
+	formattedData["reportInfo"] = reportObj;
+
+	return formattedData;
 }
 
 export const userService = { getStudentClassIds, getStudentDataOnClass };

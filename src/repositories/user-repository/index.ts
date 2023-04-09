@@ -107,7 +107,6 @@ export type StudentInClassData = {
 	}[];
 	internships: {
 		start_date: Date;
-		end_date: Date;
 		weekly_hours: number;
 		companies: {
 			name: string;
@@ -130,6 +129,16 @@ async function GetStudentClassInfo(
 		},
 		select: {
 			name: true,
+			user_class: {
+				where: { class_id: classId },
+				select: {
+					student_status: {
+						select: {
+							name: true,
+						},
+					},
+				},
+			},
 			reports: {
 				where: {
 					class_id: classId,
@@ -148,19 +157,8 @@ async function GetStudentClassInfo(
 			internships: {
 				select: {
 					start_date: true,
-					end_date: true,
 					weekly_hours: true,
 					companies: {
-						select: {
-							name: true,
-						},
-					},
-				},
-			},
-			user_class: {
-				where: { class_id: classId },
-				select: {
-					student_status: {
 						select: {
 							name: true,
 						},
