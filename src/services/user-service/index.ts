@@ -61,9 +61,8 @@ async function getStudentDataOnClass(studentId: number, classId: number) {
 		classId
 	);
 	const formData = formatStudentClassData(studentData);
-	console.log(formData);
 
-	return studentData;
+	return formData;
 }
 
 function formatStudentClassData(unformattedData: StudentInClassData) {
