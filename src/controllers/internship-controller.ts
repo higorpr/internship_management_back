@@ -8,10 +8,11 @@ export default async function createInternship(
 ) {
 	const studentId = req.userId;
 
-	const { companyName, startDate, weeklyHours } = req.body;
+	const { companyName, startDate, weeklyHours, classId } = req.body;
+	const startDateWithTimezone = startDate + "T00:00:00-03:00";
 
 	try {
-		const formattedStartDate = new Date(startDate);
+		const formattedStartDate = new Date(startDateWithTimezone);
 
 		const internship = await internshipService.postInternship(
 			companyName,
@@ -19,13 +20,28 @@ export default async function createInternship(
 			formattedStartDate,
 			Number(weeklyHours)
 		);
-		console.log(internship);
+
+		await internshipService.updateReportForInternshipCreation(
+			studentId,
+			Number(classId),
+			Number(internship.id),
+			formattedStartDate,
+			Number(weeklyHours)
+		);
 
 		return res.status(201).send(internship);
 	} catch (err) {
-		if (err.name) {
-			return res.status(err.status).send(err.message);
-		}
+		console.log(err);
 		return res.status(500).send(err);
+	}
+}
+
+export async function serviceTest(req: AuthenticatedRequest, res: Response) {
+	try {
+		const intDate = new Date("2023-04-11T00:00:00.000-03:00");
+		const dueDates = internshipService.generateDueDates(intDate, 20);
+		return res.status(200).send({ dueDates });
+	} catch (err) {
+		console.log(err);
 	}
 }

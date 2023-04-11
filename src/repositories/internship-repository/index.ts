@@ -1,4 +1,4 @@
-import { companies, internships } from "@prisma/client";
+import { companies, internships, report_status, reports } from "@prisma/client";
 import { prisma } from "../../config/db";
 
 async function createInternship(
@@ -7,12 +7,6 @@ async function createInternship(
 	startDate: Date,
 	weeklyHours: number
 ): Promise<internships> {
-	console.log("createInternship", {
-		companyId,
-		studentId,
-		startDate,
-		weeklyHours,
-	});
 	const internship = await prisma.internships.create({
 		data: {
 			company_id: companyId,
@@ -21,7 +15,6 @@ async function createInternship(
 			weekly_hours: weeklyHours,
 		},
 	});
-	console.log(internship);
 	return internship;
 }
 
@@ -44,8 +37,55 @@ async function getCompanyByName(companyName: string) {
 	});
 }
 
+async function updateReportsForInternshipCreation(
+	studentId: number,
+	classId: number,
+	internshipId: number,
+	dueDates: Date[]
+): Promise<void> {
+	const reportsStatusRes: report_status =
+		await prisma.report_status.findFirst({
+			where: {
+				name: "WAITING",
+			},
+		});
+
+	const reportStatusId = Number(reportsStatusRes.id);
+
+	const nReportsRes = await prisma.classes.findFirst({
+		where: {
+			id: classId,
+		},
+		select: {
+			class_type: {
+				select: {
+					number_reports: true,
+				},
+			},
+		},
+	});
+
+	const nReports = Number(nReportsRes.class_type.number_reports);
+
+	for (let i = 1; i <= nReports; i++) {
+		await prisma.reports.updateMany({
+			where: {
+				student_id: studentId,
+				class_id: classId,
+				report_number: i,
+			},
+			data: {
+				internship_id: internshipId,
+				status_id: reportStatusId,
+				due_date: dueDates[i - 1],
+			},
+		});
+	}
+}
+
 export const internshipRepository = {
 	createInternship,
 	createCompany,
 	getCompanyByName,
+	updateReportsForInternshipCreation,
 };
