@@ -9,6 +9,7 @@ export default async function createInternship(
 	const studentId = req.userId;
 
 	const { companyName, startDate, weeklyHours, classId } = req.body;
+	
 	const startDateWithTimezone = startDate + "T00:00:00-03:00";
 
 	try {

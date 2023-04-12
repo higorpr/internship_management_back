@@ -116,6 +116,9 @@ export type StudentInClassData = {
 		student_status: {
 			name: string;
 		};
+		classes: {
+			name: string;
+		};
 	}[];
 };
 
@@ -133,6 +136,11 @@ async function GetStudentClassInfo(
 				where: { class_id: classId },
 				select: {
 					student_status: {
+						select: {
+							name: true,
+						},
+					},
+					classes: {
 						select: {
 							name: true,
 						},

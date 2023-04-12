@@ -34,7 +34,6 @@ async function postInternship(
 ): Promise<internships> {
 	let companyId: number;
 	const companyIdCheck = await getCompanyIdByName(companyName);
-	console.log(companyIdCheck);
 
 	if (!companyIdCheck) {
 		const createdCompany = await postNewCompany(companyName);
@@ -101,6 +100,7 @@ async function updateReportForInternshipCreation(
 	startDate: Date,
 	weeklyHours: number
 ) {
+	console.log({ studentId, classId, internshipId, startDate, weeklyHours });
 	const dueDates: Date[] = generateDueDates(startDate, weeklyHours);
 
 	await internshipRepository.updateReportsForInternshipCreation(

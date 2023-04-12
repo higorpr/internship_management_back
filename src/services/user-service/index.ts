@@ -44,12 +44,6 @@ async function getStudentDataOnClass(studentId: number, classId: number) {
 		throw inexistantUserError();
 	}
 
-	// check if userId is student
-	const studentCheck = await isStudent(studentId);
-	if (!studentCheck) {
-		throw mustBeStudentError();
-	}
-
 	// check if student is enrolled
 	const enrollmentCheck = await isStudentEnrolled(studentId, classId);
 	if (!enrollmentCheck) {
@@ -88,6 +82,7 @@ function formatStudentClassData(unformattedData: StudentInClassData) {
 	const userData = {
 		studentName: unformattedData.name,
 		studentStatus: unformattedData.user_class[0].student_status.name,
+		className: unformattedData.user_class[0].classes.name,
 	};
 
 	delete formattedData.reports;
