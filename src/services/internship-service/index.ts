@@ -111,6 +111,9 @@ async function updateReportForInternshipCreation(
 	);
 }
 
+
+
+
 export const internshipService = {
 	postInternship,
 	updateReportForInternshipCreation,

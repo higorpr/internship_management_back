@@ -98,6 +98,7 @@ async function isEnrolled(
 export type StudentInClassData = {
 	name: string;
 	reports: {
+		id: number;
 		report_number: number;
 		delivery_date: Date;
 		due_date: Date;
@@ -152,6 +153,7 @@ async function GetStudentClassInfo(
 					class_id: classId,
 				},
 				select: {
+					id: true,
 					report_number: true,
 					delivery_date: true,
 					due_date: true,

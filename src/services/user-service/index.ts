@@ -4,7 +4,6 @@ import {
 } from "../../repositories/user-repository";
 import {
 	inexistantUserError,
-	mustBeStudentError,
 	studentMustBeEnrolledError,
 	unenrolledStudentError,
 } from "./errors";
@@ -74,6 +73,7 @@ function formatStudentClassData(unformattedData: StudentInClassData) {
 			reportOrder = "thirdReport";
 		}
 		reportObj[reportOrder] = {
+			id: reportData.id,
 			deliveredDate: reportData.delivery_date,
 			dueDate: reportData.due_date,
 			reportStatus: reportData.report_status.name,
@@ -85,11 +85,22 @@ function formatStudentClassData(unformattedData: StudentInClassData) {
 		className: unformattedData.user_class[0].classes.name,
 	};
 
+	let internShipData = {};
+	if (unformattedData.internships.length !== 0) {
+		internShipData = {
+			companyName: unformattedData.internships[0].companies.name,
+			internshipStartDate: unformattedData.internships[0].start_date,
+			weeklyHours: unformattedData.internships[0].weekly_hours,
+		};
+	}
+
 	delete formattedData.reports;
 	delete formattedData.name;
 	delete formattedData.user_class;
+	delete formattedData.internships;
 	formattedData["studentInfo"] = userData;
 	formattedData["reportInfo"] = reportObj;
+	formattedData["internshipInfo"] = internShipData;
 
 	return formattedData;
 }
