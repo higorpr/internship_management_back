@@ -105,4 +105,35 @@ function formatStudentClassData(unformattedData: StudentInClassData) {
 	return formattedData;
 }
 
-export const userService = { getStudentClassIds, getStudentDataOnClass };
+async function updateStudentStatus(
+	studentId: number,
+	classId: number,
+	studentStatus: string
+) {
+	// check if userId exists
+	const existanceCheck = await studentExists(studentId);
+	if (!existanceCheck) {
+		throw inexistantUserError();
+	}
+
+	// check if student is enrolled
+	const enrollmentCheck = await isStudentEnrolled(studentId, classId);
+	if (!enrollmentCheck) {
+		throw studentMustBeEnrolledError();
+	}
+
+	const updatedStatus = await userRepository.updateStudentStatus(
+		studentId,
+		classId,
+		studentStatus
+	);
+
+	return updatedStatus;
+}
+
+export const userService = {
+	getStudentClassIds,
+	getStudentDataOnClass,
+	isStudent,
+	updateStudentStatus,
+};

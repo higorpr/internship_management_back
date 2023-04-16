@@ -5,6 +5,8 @@ import path from "path";
 import sgMail from "@sendgrid/mail";
 import { AttachmentData } from "@sendgrid/helpers/classes/attachment";
 import { MailDataRequired } from "@sendgrid/mail";
+import { userService } from "../user-service";
+import { mustBeTeacherError } from "./errors";
 
 async function createInitialReports(
 	userId: number,
@@ -51,13 +53,6 @@ async function sendReportByEmail(
 		text: message,
 		attachments: [attachment],
 	};
-	// const msg = {
-	// 	to, // Change to your recipient
-	// 	from: process.env.FROM_EMAIL,
-	// 	subject: subject,
-	// 	text: message,
-	// 	html: "<strong>and easy to do anywhere, even with Node.js</strong>",
-	// };
 
 	const mail = await sgMail.send(email);
 
@@ -68,8 +63,26 @@ function deleteFile(file: Express.Multer.File) {
 	fs.unlinkSync(path.join(__dirname, "../../../", file.path));
 }
 
+async function updateReportStatus(
+	reportId: number,
+	reportStatus: string
+): Promise<reports> {
+	return await reportRepository.updateReportStatus(reportId, reportStatus);
+}
+
+async function checkIfTeacher(userId: number) {
+	const isStudent = await userService.isStudent(userId);
+	if (isStudent) {
+		throw mustBeTeacherError();
+	}
+}
+
+
+
 export const reportService = {
 	createInitialReports,
 	sendReportByEmail,
 	deleteFile,
+	updateReportStatus,
+	checkIfTeacher,
 };

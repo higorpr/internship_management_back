@@ -1,4 +1,4 @@
-import { user_class } from "@prisma/client";
+import { user_class, users } from "@prisma/client";
 import { prisma } from "../../config/db";
 
 async function getStatusIdFromName(status: string): Promise<number> {
@@ -179,6 +179,30 @@ async function GetStudentClassInfo(
 	});
 }
 
+async function updateStudentStatus(
+	studentId: number,
+	classId: number,
+	studentStatus: string
+): Promise<user_class> {
+	const studentStatusId = await getStatusIdFromName(studentStatus);
+	const userClassIdRes = await prisma.user_class.findFirst({
+		where: {
+			user_id: studentId,
+			class_id: classId,
+		},
+	});
+	const userClassId = userClassIdRes.id;
+
+	return await prisma.user_class.update({
+		where: {
+			id: userClassId,
+		},
+		data: {
+			student_status_id: studentStatusId,
+		},
+	});
+}
+
 export const userRepository = {
 	getStatusIdFromName,
 	createStudentHistory,
@@ -188,4 +212,5 @@ export const userRepository = {
 	studentExists,
 	isStudent,
 	isEnrolled,
+	updateStudentStatus,
 };

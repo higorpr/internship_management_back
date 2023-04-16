@@ -23,4 +23,24 @@ async function createInitialReport(
 	});
 }
 
-export const reportRepository = {createInitialReport};
+async function updateReportStatus(
+	reportId: number,
+	reportStatus: string
+): Promise<reports> {
+	const reportStatusId = await prisma.report_status.findFirst({
+		where: {
+			name: reportStatus,
+		},
+	});
+
+	return await prisma.reports.update({
+		where: {
+			id: reportId,
+		},
+		data: {
+			status_id: reportStatusId.id,
+		},
+	});
+}
+
+export const reportRepository = { createInitialReport, updateReportStatus };
