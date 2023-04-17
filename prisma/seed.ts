@@ -85,23 +85,7 @@ async function main() {
 			console.log(type);
 		}
 	});
-
-// 	companyNames.forEach(async (company) => {
-// 		const companyQuery = await prisma.companies.findFirst({
-// 			where: {
-// 				name: company,
-// 			},
-// 		});
-// 		if (!companyQuery) {
-// 			const companyEntry = await prisma.companies.create({
-// 				data: {
-// 					name: company,
-// 				},
-// 			});
-// 			console.log(companyEntry);
-// 		}
-// 	});
-// }
+}
 
 main()
 	.catch((e) => {
