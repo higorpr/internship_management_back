@@ -25,12 +25,30 @@ export async function sendReportEmail(
 	req: AuthenticatedRequest,
 	res: Response
 ) {
+	const file = req.files[0];
+	const { reportId } = req.body;
+	// To be used on Version 2
+	// const professorId = req.userId;
+
 	try {
+		const reportInfo = await reportService.getReportInfo(Number(reportId));
+
 		const to = "higorpr@gmail.com";
-		const subject = "Teste de envio de email com pdf";
-		const message = "Espero que tenha dado certo";
-		const file = req.files[0];
-		console.log(file);
+
+		const subject = `Envio do Relatório ${reportInfo.report_number}_V.${
+			reportInfo.last_version_sent + 1
+		} - Estudante ${reportInfo.users.name}`;
+
+		const message = `Segue anexo o Relatório ${
+			reportInfo.report_number
+		}_Versão ${reportInfo.last_version_sent + 1} do Estudante ${
+			reportInfo.users.name
+		}, matriculado em ${
+			reportInfo.classes.name
+		}. O relatório foi enviado em ${new Date().toLocaleString("pt-BR", {
+			timeZone: "America/Sao_Paulo",
+		})}.`;
+
 		const mailConfirmation = await reportService.sendReportByEmail(
 			to,
 			subject,
@@ -39,8 +57,13 @@ export async function sendReportEmail(
 		);
 		if (mailConfirmation) {
 			reportService.deleteFile(file);
+			const updatedReport =
+				await reportService.updateReportDeliveryInformation(
+					Number(reportId)
+				);
+			return res.status(200).send(updatedReport);
 		}
-		return res.status(200).send(mailConfirmation);
+
 		// return res.status(200).send(file);
 	} catch (err) {
 		console.log(err);

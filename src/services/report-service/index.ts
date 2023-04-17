@@ -35,13 +35,12 @@ async function sendReportByEmail(
 	file: Express.Multer.File
 ) {
 	sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-	// console.log("DIRNAME", __dirname);
-	const caminho = path.join(__dirname, "../../../", file.path);
-	console.log("CAMINHO", caminho);
+
+	const dirPath = path.join(__dirname, "../../../", file.path);
 
 	const attachment: AttachmentData = {
 		filename: file.originalname,
-		content: fs.readFileSync(caminho).toString("base64"),
+		content: fs.readFileSync(dirPath).toString("base64"),
 		type: file.mimetype,
 		disposition: "attachment",
 	};
@@ -59,8 +58,9 @@ async function sendReportByEmail(
 	return mail;
 }
 
-function deleteFile(file: Express.Multer.File) {
-	fs.unlinkSync(path.join(__dirname, "../../../", file.path));
+function deleteFile(file: Express.Multer.File): void {
+	const dirPath = path.join(__dirname, "../../../", file.path);
+	fs.unlinkSync(dirPath);
 }
 
 async function updateReportStatus(
@@ -77,7 +77,37 @@ async function checkIfTeacher(userId: number) {
 	}
 }
 
+async function updateReportsIfExpired(classId: number): Promise<reports[]> {
+	const reports = await reportRepository.getClassReports(classId);
+	const today = new Date();
+	const updatedReports: reports[] = [];
+	const waitingStatus = await reportRepository.getReportStatusId("WAITING");
+	reports.forEach(async (report) => {
+		const dueDate = report.due_date;
+		if (
+			today.getTime() > dueDate.getTime() &&
+			report.status_id === waitingStatus.id
+		) {
+			const updatedReport = await reportRepository.updateReportStatus(
+				report.id,
+				"LATE"
+			);
+			updatedReports.push(updatedReport);
+		}
+	});
 
+	return updatedReports;
+}
+
+async function getReportInfo(reportId: number) {
+	return await reportRepository.getReportInfo(reportId);
+}
+
+async function updateReportDeliveryInformation(
+	reportId: number
+): Promise<reports> {
+	return await reportRepository.updateReportDeliveryInformation(reportId);
+}
 
 export const reportService = {
 	createInitialReports,
@@ -85,4 +115,7 @@ export const reportService = {
 	deleteFile,
 	updateReportStatus,
 	checkIfTeacher,
+	updateReportsIfExpired,
+	getReportInfo,
+	updateReportDeliveryInformation,
 };

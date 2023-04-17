@@ -19,6 +19,7 @@ async function createInitialReport(
 			is_delivered: false,
 			report_number: reportOrder,
 			status_id: TBDStatusId,
+			last_version_sent: 0,
 		},
 	});
 }
@@ -43,4 +44,85 @@ async function updateReportStatus(
 	});
 }
 
-export const reportRepository = { createInitialReport, updateReportStatus };
+async function getClassReports(classId: number): Promise<reports[]> {
+	return await prisma.reports.findMany({
+		where: {
+			class_id: classId,
+		},
+	});
+}
+
+async function getReportInfo(reportId: number) {
+	return await prisma.reports.findFirst({
+		where: {
+			id: reportId,
+		},
+		include: {
+			users: {
+				select: {
+					name: true,
+				},
+			},
+			classes: {
+				select: {
+					name: true,
+				},
+			},
+		},
+	});
+}
+
+async function updateReportDeliveryInformation(
+	reportId: number
+): Promise<reports> {
+	const deliveredStatusObj = await prisma.report_status.findFirst({
+		where: {
+			name: "DELIVERED",
+		},
+	});
+	const versionObj = await prisma.reports.findFirst({
+		where: {
+			id: reportId,
+		},
+		select: {
+			last_version_sent: true,
+		},
+	});
+
+	const version = versionObj.last_version_sent;
+	const deliveredStatusId = deliveredStatusObj.id;
+
+	return await prisma.reports.update({
+		where: {
+			id: reportId,
+		},
+		data: {
+			is_delivered: true,
+			status_id: deliveredStatusId,
+			delivery_date: new Date(),
+			last_version_sent: version + 1,
+		},
+	});
+}
+
+async function getReportStatusId(
+	reportStatus: string
+): Promise<{ id: number }> {
+	return await prisma.report_status.findFirst({
+		where: {
+			name: reportStatus,
+		},
+		select: {
+			id: true,
+		},
+	});
+}
+
+export const reportRepository = {
+	createInitialReport,
+	updateReportStatus,
+	getClassReports,
+	getReportInfo,
+	updateReportDeliveryInformation,
+	getReportStatusId,
+};

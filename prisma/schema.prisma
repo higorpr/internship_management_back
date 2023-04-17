@@ -54,7 +54,7 @@ model reports {
   internship_id     Int?
   status_id         Int
   delivery_date     DateTime?     @db.Date
-  last_version_sent String?
+  last_version_sent Int?
   due_date          DateTime?      @db.Date
   users             users         @relation(fields: [student_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "reports_fk0")
   classes           classes       @relation(fields: [class_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "reports_fk1")

@@ -40,6 +40,7 @@ export async function updateStudentStatus(
 		);
 		return res.status(200).send(updatedStudentStatus);
 	} catch (err) {
+		// console.log(err)
 		if (err.name !== "Error") {
 			return res.status(err.status).send(err.message);
 		}

@@ -100,7 +100,7 @@ async function updateReportForInternshipCreation(
 	startDate: Date,
 	weeklyHours: number
 ) {
-	console.log({ studentId, classId, internshipId, startDate, weeklyHours });
+	
 	const dueDates: Date[] = generateDueDates(startDate, weeklyHours);
 
 	await internshipRepository.updateReportsForInternshipCreation(

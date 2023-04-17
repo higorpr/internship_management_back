@@ -2,6 +2,7 @@ import { AuthenticatedRequest } from "../middleware/auth-middleware";
 import { Response } from "express";
 import { classroomService } from "../services/classroom-service";
 import { userService } from "../services/user-service";
+import { reportService } from "../services/report-service";
 
 export async function getAllClasses(req: AuthenticatedRequest, res: Response) {
 	const userId = req.userId;
@@ -97,13 +98,15 @@ export async function getSingleClassInfo(
 	res: Response
 ) {
 	const { classId } = req.params;
-	
+
 	if (!classId) {
 		return res.status(400).send("Missing body");
 	}
-	
 
 	try {
+		const updatedReports = await reportService.updateReportsIfExpired(
+			Number(classId)
+		);
 		const classInfo = await classroomService.getCompleteClassInfo(
 			Number(classId)
 		);

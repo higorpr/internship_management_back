@@ -9,7 +9,7 @@ const uploads = multer({ dest: "temp/" });
 
 reportRouter
 	.all("/*", authentication)
-	.post("/reportStatus", gradeReport)
+	.put("/reportStatus", gradeReport)
 	.post("/sendReport", uploads.array("files"), sendReportEmail);
 
 export { reportRouter };
