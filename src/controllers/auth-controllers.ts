@@ -7,7 +7,11 @@ export async function signUp(req: Request, res: Response) {
 		await authService.createUser(name, email, password);
 		return res.sendStatus(201);
 	} catch (err) {
-		return res.status(err.status).send(err.message);
+		console.log(err);
+		if (err.name === "Duplicated Email Error") {
+			return res.status(401).send(err.message);
+		}
+		return res.status(500).send(err);
 	}
 }
 
@@ -18,6 +22,9 @@ export async function login(req: Request, res: Response) {
 		const token = await authService.login(email, password);
 		return res.status(200).send(token);
 	} catch (err) {
-		return res.status(err.status).send(err.message);
+		if (err.name === "Invalid Login Error") {
+			return res.status(401).send(err.message);
+		}
+		return res.status(500).send(err);
 	}
 }

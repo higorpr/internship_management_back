@@ -5,7 +5,8 @@ async function createInternship(
 	companyId: number,
 	studentId: number,
 	startDate: Date,
-	weeklyHours: number
+	weeklyHours: number,
+	classId: number
 ): Promise<internships> {
 	const internship = await prisma.internships.create({
 		data: {
@@ -13,6 +14,7 @@ async function createInternship(
 			student_id: studentId,
 			start_date: startDate,
 			weekly_hours: weeklyHours,
+			class_id: classId,
 		},
 	});
 	return internship;

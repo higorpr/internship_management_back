@@ -1,6 +1,7 @@
 import { AuthenticatedRequest } from "../middleware/auth-middleware";
 import { Response } from "express";
 import { internshipService } from "../services/internship-service";
+import { reportService } from "../services/report-service";
 
 export async function createInternship(
 	req: AuthenticatedRequest,
@@ -19,7 +20,8 @@ export async function createInternship(
 			companyName,
 			studentId,
 			formattedStartDate,
-			Number(weeklyHours)
+			Number(weeklyHours),
+			Number(classId)
 		);
 
 		await internshipService.updateReportForInternshipCreation(
@@ -29,6 +31,8 @@ export async function createInternship(
 			formattedStartDate,
 			Number(weeklyHours)
 		);
+
+		await reportService.updateReportsIfExpired(Number(classId));
 
 		return res.status(201).send(internship);
 	} catch (err) {

@@ -124,12 +124,18 @@ async function getCompleteClassInfo(
 				},
 			},
 			user_class: {
+				where: {
+					class_id: classId,
+				},
 				select: {
 					users: {
 						select: {
 							id: true,
 							name: true,
 							reports: {
+								where: {
+									class_id: classId,
+								},
 								select: {
 									report_number: true,
 									report_status: {

@@ -165,6 +165,9 @@ async function GetStudentClassInfo(
 				},
 			},
 			internships: {
+				where: {
+					class_id: classId,
+				},
 				select: {
 					start_date: true,
 					weekly_hours: true,

@@ -10,9 +10,9 @@
 		"seed": "npx prisma db seed",
 		"studio": "npx prisma studio",
 		"build": "tsc",
-		"start": "npm run prisma:migration:deploy && node dist/src/server.js",
+		"start": "npm run prisma:migration:deploy && npm run seed && node dist/src/server.js",
 		"db:pull": "npx prisma db pull",
-		"prisma:migration:run": "npx prisma migrate dev",
+		"prisma:migration:dev": "npx prisma migrate dev",
 		"prisma:migration:deploy": "npx prisma migrate deploy"
 	},
 	"repository": {

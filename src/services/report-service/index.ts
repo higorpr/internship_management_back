@@ -83,16 +83,15 @@ async function updateReportsIfExpired(classId: number): Promise<reports[]> {
 	const updatedReports: reports[] = [];
 	const waitingStatus = await reportRepository.getReportStatusId("WAITING");
 	reports.forEach(async (report) => {
-		const dueDate = report.due_date;
-		if (
-			today.getTime() > dueDate.getTime() &&
-			report.status_id === waitingStatus.id
-		) {
-			const updatedReport = await reportRepository.updateReportStatus(
-				report.id,
-				"LATE"
-			);
-			updatedReports.push(updatedReport);
+		if (report.status_id === waitingStatus.id) {
+			const dueDate = report.due_date;
+			if (today.getTime() > dueDate.getTime()) {
+				const updatedReport = await reportRepository.updateReportStatus(
+					report.id,
+					"LATE"
+				);
+				updatedReports.push(updatedReport);
+			}
 		}
 	});
 

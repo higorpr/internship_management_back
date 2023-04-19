@@ -38,6 +38,7 @@ model internships {
   id           Int       @id(map: "internships_pk") @default(autoincrement())
   company_id   Int
   student_id   Int
+  class_id     Int 
   start_date   DateTime  @db.Date
   weekly_hours Int
   companies    companies @relation(fields: [company_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "internships_fk0")
