@@ -206,6 +206,24 @@ async function updateStudentStatus(
 	});
 }
 
+async function getUserById(userId: number) {
+	return await prisma.users.findFirst({
+		where: {
+			id: userId,
+		},
+		select: {
+			id: true,
+			name: true,
+			email: true,
+			user_types: {
+				select: {
+					name: true,
+				},
+			},
+		},
+	});
+}
+
 export const userRepository = {
 	getStatusIdFromName,
 	createStudentHistory,
@@ -216,4 +234,5 @@ export const userRepository = {
 	isStudent,
 	isEnrolled,
 	updateStudentStatus,
+	getUserById,
 };

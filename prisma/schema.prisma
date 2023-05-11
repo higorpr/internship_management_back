@@ -91,7 +91,16 @@ model users {
   internships       internships[]
   reports           reports[]
   user_class        user_class[]
+  usermail_confirmation usermail_confirmation[]
   user_types        user_types      @relation(fields: [user_type_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "users_fk0")
+}
+
+model usermail_confirmation {
+  id Int @id(map:"usermail_confirmation_pk") @default(autoincrement())
+  user_id Int @unique
+  confirmation_code String
+  is_confirmed Boolean @default(false)
+  users users @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map:"usermail_confirmation_fk0")
 }
 
 model user_class {

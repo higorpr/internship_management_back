@@ -15,3 +15,28 @@ export function invalidLoginInfoError(): ApplicationError {
 		status: 401,
 	};
 }
+
+export function wrongConfirmationCodeError(): ApplicationError {
+	return {
+		name: 'Wrong Confirmation Code Error',
+		message: 'O código de confirmação está incorreto',
+		status: 401
+	}
+}
+
+export function alreadyConfirmedEmailError(): ApplicationError {
+	return {
+		name: 'Already Confirmed Email Error',
+		message: 'Esse e-mail já foi confirmado',
+		status: 409
+	}
+}
+
+export function userNotRegisteredError(): ApplicationError {
+	return {
+		name: 'User Not Registered Error',
+		message: 'Esse usuário não consta nos registros',
+		status: 404
+	}
+}
+

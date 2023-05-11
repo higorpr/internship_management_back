@@ -1,7 +1,7 @@
-import { users, user_types } from "@prisma/client";
+import { users, user_types, usermail_confirmation } from "@prisma/client";
 import { prisma } from "../../config/db";
 
-type UserReturn = {
+export type UserReturn = {
 	id: number;
 	name: string;
 	email: string;
@@ -56,10 +56,53 @@ async function createNewUser(
 	});
 }
 
+async function createEmailConfirmationEntry(
+	userId: number,
+	confirmationCode: string
+): Promise<usermail_confirmation> {
+	return await prisma.usermail_confirmation.create({
+		data: {
+			user_id: userId,
+			confirmation_code: confirmationCode,
+			is_confirmed: false,
+		},
+	});
+}
+
+async function getUsermailConfirmationInfo(
+	userId: number
+): Promise<{ confirmation_code: string; is_confirmed: boolean }> {
+	return await prisma.usermail_confirmation.findFirst({
+		where: {
+			user_id: userId,
+		},
+		select: {
+			confirmation_code: true,
+			is_confirmed: true,
+		},
+	});
+}
+
+async function confirmValidEmail(
+	userId: number
+): Promise<usermail_confirmation> {
+	return await prisma.usermail_confirmation.update({
+		where: {
+			user_id: userId,
+		},
+		data: {
+			is_confirmed: true,
+		},
+	});
+}
+
 const authRepository = {
 	getUserByEmail,
 	createNewUser,
 	getUserTypeIdByTypeName,
+	createEmailConfirmationEntry,
+	getUsermailConfirmationInfo,
+	confirmValidEmail,
 };
 
 export default authRepository;
