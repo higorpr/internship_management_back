@@ -96,6 +96,29 @@ async function confirmValidEmail(
 	});
 }
 
+async function getUserConfirmationCodeByEmail(email: string): Promise<{
+	name: string;
+	usermail_confirmation: {
+		confirmation_code: string;
+		user_id: number;
+	}[];
+}> {
+	return await prisma.users.findFirst({
+		where: {
+			email: email,
+		},
+		select: {
+			name: true,
+			usermail_confirmation: {
+				select: {
+					user_id: true,
+					confirmation_code: true,
+				},
+			},
+		},
+	});
+}
+
 const authRepository = {
 	getUserByEmail,
 	createNewUser,
@@ -103,6 +126,7 @@ const authRepository = {
 	createEmailConfirmationEntry,
 	getUsermailConfirmationInfo,
 	confirmValidEmail,
+	getUserConfirmationCodeByEmail,
 };
 
 export default authRepository;

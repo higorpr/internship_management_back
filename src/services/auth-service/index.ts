@@ -10,7 +10,7 @@ import {
 } from "./errors";
 import bcrypt from "bcrypt";
 import { customAlphabet } from "nanoid";
-import { userRepository } from "../../repositories/user-repository";
+import sgMail from "@sendgrid/mail";
 
 async function createUser(
 	name: string,
@@ -97,7 +97,7 @@ function createSession(userId: number) {
 	return token;
 }
 
-async function isValidEmail(email: string): Promise<boolean> {
+async function isValidatedEmail(email: string): Promise<boolean> {
 	const user = await getUserInfoByEmail(email);
 	if (!user) {
 		throw userNotRegisteredError();
@@ -110,11 +110,12 @@ async function isValidEmail(email: string): Promise<boolean> {
 }
 
 async function validateEmail(
-	userId: number,
+	email: string,
 	confirmationCode: string
 ): Promise<usermail_confirmation> {
+	const userInfo = await getUserInfoByEmail(email);
 	const userConfirmationInfo =
-		await authRepository.getUsermailConfirmationInfo(userId);
+		await authRepository.getUsermailConfirmationInfo(userInfo.id);
 
 	if (userConfirmationInfo.confirmation_code !== confirmationCode) {
 		throw wrongConfirmationCodeError();
@@ -124,8 +125,47 @@ async function validateEmail(
 		throw alreadyConfirmedEmailError();
 	}
 
-	const mailConfirmation = await authRepository.confirmValidEmail(userId);
+	const mailConfirmation = await authRepository.confirmValidEmail(
+		userInfo.id
+	);
 	return mailConfirmation;
 }
 
-export const authService = { createUser, login, validateEmail, isValidEmail };
+async function sendConfirmationCodeEmail(
+	useremail: string,
+	confirmationCode: string
+) {
+	sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+
+	const content = `Seu código de acesso à Plataforma de Controle de Relatórios de Estágio é: ${confirmationCode} `;
+
+	const email = {
+		to: useremail,
+		from: process.env.FROM_EMAIL,
+		subject: "Plataforma de Controle de Relatórios - Código de Acesso",
+		text: content,
+	};
+
+	const mail = await sgMail.send(email);
+
+	return mail;
+}
+
+async function getConfirmationCode(email: string): Promise<{
+	name: string;
+	usermail_confirmation: {
+		confirmation_code: string;
+		user_id: number;
+	}[];
+}> {
+	return await authRepository.getUserConfirmationCodeByEmail(email);
+}
+
+export const authService = {
+	createUser,
+	login,
+	validateEmail,
+	isValidatedEmail,
+	sendConfirmationCodeEmail,
+	getConfirmationCode,
+};
