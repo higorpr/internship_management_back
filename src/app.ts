@@ -15,7 +15,7 @@ const app = express();
 
 app.use(json())
 	.use(cors())
-	.get("/health", authentication, (req, res) => res.send("OK!"))
+	.get("/health", (req, res) => res.send("OK!"))
 	.use("/auth", authRouter)
 	.use("/user", userRouter)
 	.use("/classroom", classroomRouter)

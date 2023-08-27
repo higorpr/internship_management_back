@@ -6,16 +6,17 @@ import path from "path";
 
 const reportRouter = Router();
 
-const storage = multer.diskStorage({
-	destination: function (req, file, cb) {
-		cb(null, path.join(__dirname, "../uploads/"));
-	},
-	filename: function (req, file, cb) {
-		cb(null, file.originalname);
-	},
-});
+// const storage = multer.diskStorage({
+// 	destination: function (req, file, cb) {
+// 		cb(null, path.join(__dirname, "../uploads/"));
+// 	},
+// 	filename: function (req, file, cb) {
+// 		cb(null, file.originalname);
+// 	},
+// });
 
-const upload = multer({ storage: storage });
+// const upload = multer({ storage: storage });
+const upload = multer();
 
 reportRouter
 	.all("/*", authentication)
