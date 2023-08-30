@@ -69,9 +69,29 @@ async function login(email: string, password: string) {
 
 	delete user.password; // remove password from object sent to user
 
+	// Check if user has already validated email
+	let validatedEmail = true;
+	const emailValidated = await isValidatedEmail(email);
+
+	if (emailValidated === false) {
+		validatedEmail = false;
+		const confirmationObj = await getConfirmationCode(email);
+		const confirmationCode =
+			confirmationObj.usermail_confirmation[0].confirmation_code;
+
+		sendConfirmationCodeEmail(email, confirmationCode);
+
+		return { validatedEmail: validatedEmail, userInfo: {} };
+	}
+
 	const token = createSession(user.id); // Generate token based on userId
 
-	return { user, token }; // Send user info to user
+	const userOutput = {
+		validatedEmail: validatedEmail,
+		userInfo: { user, token },
+	};
+
+	return userOutput; // Send user info to user
 }
 
 async function getUserInfoByEmail(email: string): Promise<UserReturn> {
