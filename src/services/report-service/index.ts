@@ -37,11 +37,11 @@ async function sendReportByEmail(
 	sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 	// const dirPath = path.join(__dirname, "../../../", file.path);
-	const dirPath = path.join(file.path);
+	// const dirPath = path.join(file.path);
 
 	const attachment: AttachmentData = {
 		filename: file.originalname,
-		content: fs.readFileSync(dirPath).toString("base64"),
+		content: file.buffer.toString("base64"),
 		type: file.mimetype,
 		disposition: "attachment",
 	};

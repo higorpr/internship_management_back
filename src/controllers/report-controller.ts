@@ -26,10 +26,14 @@ export async function sendReportEmail(
 	res: Response
 ) {
 	const file = req.files[0];
+	console.log(`File:`);
+	console.log(file)
 	const { reportId } = req.body;
+	console.log(`ReportId: ${reportId}`);
 	// To be used on Version 2
 	// const professorId = req.userId;
 
+	// TODO: Add type checking for received file
 	try {
 		const reportInfo = await reportService.getReportInfo(Number(reportId));
 
@@ -56,15 +60,18 @@ export async function sendReportEmail(
 			file
 		);
 		if (mailConfirmation) {
-			reportService.deleteFile(file);
+			//FIXME: Remove file deletion
+			// reportService.deleteFile(file);
 			const updatedReport =
 				await reportService.updateReportDeliveryInformation(
 					Number(reportId)
 				);
 			return res.status(200).send(updatedReport);
-		}
 
-		// return res.status(200).send(file);
+		}
+		// return res.sendStatus(200);
+		//FIXME: Why am I sending back the file?
+		return res.status(200).send(file); 
 	} catch (err) {
 		console.log(err);
 		return res.status(500).send(err);
