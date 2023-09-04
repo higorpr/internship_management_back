@@ -1,19 +1,19 @@
 # Imagem base
-FROM node:16
+# FROM node:16
 
-WORKDIR /usr/src
+# WORKDIR /usr/src
 
-COPY . .
+# COPY . .
 
-# Porta 
-EXPOSE 5000
+# # Porta 
+# EXPOSE 5000
 
-# Instala as dependências
-RUN npm i
+# # Instala as dependências
+# RUN npm i
 
-# Cria a build (compila o .ts em .js)
-RUN npm run build
+# # Cria a build (compila o .ts em .js)
+# RUN npm run build
 
-# Comando a ser executado quando alguém rodar a imagem
-CMD [ "npm", "start" ]
+# # Comando a ser executado quando alguém rodar a imagem
+# CMD [ "npm", "start" ]
 
