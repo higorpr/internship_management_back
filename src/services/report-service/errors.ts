@@ -7,3 +7,11 @@ export function mustBeTeacherError(): ApplicationError {
 		status: 401,
 	};
 }
+
+export function notPdfFile(): ApplicationError {
+	return {
+		name: "Not Pdf File",
+		message: "O arquivo enviado deve ser um PDF",
+		status: 406,
+	};
+}

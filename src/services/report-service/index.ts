@@ -6,7 +6,7 @@ import sgMail from "@sendgrid/mail";
 import { AttachmentData } from "@sendgrid/helpers/classes/attachment";
 import { MailDataRequired } from "@sendgrid/mail";
 import { userService } from "../user-service";
-import { mustBeTeacherError } from "./errors";
+import { mustBeTeacherError, notPdfFile } from "./errors";
 
 async function createInitialReports(
 	userId: number,
@@ -32,15 +32,16 @@ async function sendReportByEmail(
 	to: string,
 	subject: string,
 	message: string,
-	file: Express.Multer.File
+	file: Express.Multer.File,
+	studentName: string,
+	reportNumber: number,
+	reportVersion: number
 ) {
 	sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
-	// const dirPath = path.join(__dirname, "../../../", file.path);
-	// const dirPath = path.join(file.path);
-
 	const attachment: AttachmentData = {
-		filename: file.originalname,
+		filename:
+			`Relatório ${reportNumber}_${studentName}_V${reportVersion}`.toUpperCase(),
 		content: file.buffer.toString("base64"),
 		type: file.mimetype,
 		disposition: "attachment",
@@ -109,6 +110,12 @@ async function updateReportDeliveryInformation(
 	return await reportRepository.updateReportDeliveryInformation(reportId);
 }
 
+function checkReportFileType(reportFile: Express.Multer.File): void {
+	if (reportFile.mimetype !== "application/pdf") {
+		throw notPdfFile();
+	}
+}
+
 export const reportService = {
 	createInitialReports,
 	sendReportByEmail,
@@ -118,4 +125,5 @@ export const reportService = {
 	updateReportsIfExpired,
 	getReportInfo,
 	updateReportDeliveryInformation,
+	checkReportFileType,
 };

@@ -7,6 +7,21 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model users {
+  id                    Int                     @id(map: "users_pk") @default(autoincrement())
+  name                  String
+  email                 String
+  password              String
+  user_type_id          Int
+  documentation_ok      Boolean
+  internships           internships[]
+  reports               reports[]
+  user_class            user_class[]
+  usermail_confirmation usermail_confirmation[]
+  classes               classes[]
+  user_types            user_types              @relation(fields: [user_type_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "users_fk0")
+}
+
 model classes {
   id               Int          @id(map: "classes_pk") @default(autoincrement())
   name             String
@@ -16,7 +31,9 @@ model classes {
   class_code       String
   background_color String
   class_type_id    Int
+  owner_id         Int
   class_type       class_type   @relation(fields: [class_type_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "classes_fk1")
+  users            users        @relation(fields: [owner_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "classes_fk2")
   reports          reports[]
   user_class       user_class[]
 }
@@ -38,7 +55,7 @@ model internships {
   id           Int       @id(map: "internships_pk") @default(autoincrement())
   company_id   Int
   student_id   Int
-  class_id     Int 
+  class_id     Int
   start_date   DateTime  @db.Date
   weekly_hours Int
   companies    companies @relation(fields: [company_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "internships_fk0")
@@ -56,10 +73,10 @@ model reports {
   status_id         Int
   delivery_date     DateTime?     @db.Date
   last_version_sent Int?
-  due_date          DateTime?      @db.Date
+  due_date          DateTime?     @db.Date
   users             users         @relation(fields: [student_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "reports_fk0")
   classes           classes       @relation(fields: [class_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "reports_fk1")
-  internships       internships?   @relation(fields: [internship_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "reports_fk2")
+  internships       internships?  @relation(fields: [internship_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "reports_fk2")
   report_status     report_status @relation(fields: [status_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "reports_fk3")
 }
 
@@ -70,8 +87,8 @@ model report_status {
 }
 
 model student_status {
-  id    Int     @id(map: "student_status_pk") @default(autoincrement())
-  name  String
+  id         Int          @id(map: "student_status_pk") @default(autoincrement())
+  name       String
   user_class user_class[]
 }
 
@@ -81,34 +98,20 @@ model user_types {
   users users[]
 }
 
-model users {
-  id                Int             @id(map: "users_pk") @default(autoincrement())
-  name              String
-  email             String
-  password          String
-  user_type_id      Int  
-  documentation_ok  Boolean
-  internships       internships[]
-  reports           reports[]
-  user_class        user_class[]
-  usermail_confirmation usermail_confirmation[]
-  user_types        user_types      @relation(fields: [user_type_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "users_fk0")
-}
-
 model usermail_confirmation {
-  id Int @id(map:"usermail_confirmation_pk") @default(autoincrement())
-  user_id Int @unique
+  id                Int     @id(map: "usermail_confirmation_pk") @default(autoincrement())
+  user_id           Int     @unique
   confirmation_code String
-  is_confirmed Boolean @default(false)
-  users users @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map:"usermail_confirmation_fk0")
+  is_confirmed      Boolean @default(false)
+  users             users   @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "usermail_confirmation_fk0")
 }
 
 model user_class {
-  id       Int     @id @default(autoincrement())
-  user_id  Int
-  class_id Int
+  id                Int             @id @default(autoincrement())
+  user_id           Int
+  class_id          Int
   student_status_id Int?
-  classes  classes @relation(fields: [class_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  users    users   @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  classes           classes         @relation(fields: [class_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  users             users           @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   student_status    student_status? @relation(fields: [student_status_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "user_class_fk0")
 }

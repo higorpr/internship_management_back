@@ -1,6 +1,7 @@
 import { AuthenticatedRequest } from "../middleware/auth-middleware";
 import { Response } from "express";
 import { reportService } from "../services/report-service";
+import { classroomService } from "../services/classroom-service";
 
 export async function gradeReport(req: AuthenticatedRequest, res: Response) {
 	const { reportId, reportStatus } = req.body;
@@ -26,26 +27,28 @@ export async function sendReportEmail(
 	res: Response
 ) {
 	const file = req.files[0];
-	console.log(`File:`);
-	console.log(file)
-	const { reportId } = req.body;
-	console.log(`ReportId: ${reportId}`);
-	// To be used on Version 2
-	// const professorId = req.userId;
+	console.log(file);
+	const { reportId, classId } = req.body;
 
-	// TODO: Add type checking for received file
 	try {
+		reportService.checkReportFileType(file);
+
 		const reportInfo = await reportService.getReportInfo(Number(reportId));
 
-		const to = "higorpr@gmail.com";
+		const ownerInfo = await classroomService.getOwnerInfo(Number(classId));
+
+		const to = ownerInfo.email;
 
 		const subject = `Envio do Relatório ${reportInfo.report_number}_V.${
 			reportInfo.last_version_sent + 1
 		} - Estudante ${reportInfo.users.name}`;
 
-		const message = `Segue anexo o Relatório ${
+		const currentVersion = reportInfo.last_version_sent + 1;
+
+		const message = `Bom dia, professor(a) ${ownerInfo.name}. \n
+		\nSegue anexo o Relatório ${
 			reportInfo.report_number
-		}_Versão ${reportInfo.last_version_sent + 1} do Estudante ${
+		}_Versão ${currentVersion} do Estudante ${
 			reportInfo.users.name
 		}, matriculado em ${
 			reportInfo.classes.name
@@ -57,23 +60,26 @@ export async function sendReportEmail(
 			to,
 			subject,
 			message,
-			file
+			file,
+			reportInfo.users.name,
+			reportInfo.report_number,
+			currentVersion
 		);
 		if (mailConfirmation) {
-			//FIXME: Remove file deletion
-			// reportService.deleteFile(file);
 			const updatedReport =
 				await reportService.updateReportDeliveryInformation(
 					Number(reportId)
 				);
 			return res.status(200).send(updatedReport);
-
 		}
 		// return res.sendStatus(200);
 		//FIXME: Why am I sending back the file?
-		return res.status(200).send(file); 
+		return res.status(200).send(file);
 	} catch (err) {
 		console.log(err);
+		if (err.name === "Not Pdf File") {
+			return res.status(err.status).send(err.message);
+		}
 		return res.status(500).send(err);
 	}
 }

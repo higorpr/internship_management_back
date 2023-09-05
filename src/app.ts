@@ -7,7 +7,6 @@ import {
 	internshipRouter,
 	userRouter,
 } from "./routers";
-import { authentication } from "./middleware/auth-middleware";
 import { reportRouter } from "./routers/report-routers";
 
 dotenv.config();

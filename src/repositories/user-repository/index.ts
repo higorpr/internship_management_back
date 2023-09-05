@@ -1,4 +1,4 @@
-import { user_class, users } from "@prisma/client";
+import { user_class } from "@prisma/client";
 import { prisma } from "../../config/db";
 
 async function getStatusIdFromName(status: string): Promise<number> {

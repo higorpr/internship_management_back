@@ -1,5 +1,5 @@
 import { prisma } from "../../config/db";
-import { classes, class_type } from "@prisma/client";
+import { classes, class_type, users } from "@prisma/client";
 
 type UserType = { user_types: { name: string } };
 
@@ -27,7 +27,8 @@ async function postNewClass(
 	startDate: Date,
 	endDate: Date,
 	classCode: string,
-	classTypeId: number
+	classTypeId: number,
+	ownerId: number
 ): Promise<classes> {
 	return await prisma.classes.create({
 		data: {
@@ -38,6 +39,7 @@ async function postNewClass(
 			class_code: classCode,
 			background_color: "#000000",
 			class_type_id: classTypeId,
+			owner_id: ownerId,
 		},
 	});
 }
@@ -153,6 +155,20 @@ async function getCompleteClassInfo(
 	});
 }
 
+async function getOwnerInfo(classId: number): Promise<users> {
+	const ownerIdObj = await prisma.classes.findFirst({
+		where: { id: classId },
+		select: {
+			owner_id: true,
+		},
+	});
+	const ownerId = ownerIdObj.owner_id;
+	const ownerInfo = await prisma.users.findFirst({
+		where: { id: ownerId },
+	});
+	return ownerInfo
+}
+
 export const classroomRepository = {
 	getAllClasses,
 	getUserType,
@@ -162,4 +178,5 @@ export const classroomRepository = {
 	getClassByCode,
 	getStudentClassesInfo,
 	getCompleteClassInfo,
+	getOwnerInfo
 };

@@ -34,7 +34,8 @@ async function createNewClass(
 	name: string,
 	startDate: Date,
 	endDate: Date,
-	classType: string
+	classType: string,
+	ownerId: number
 ): Promise<classes> {
 	const classCode: string = createRandomClassCode();
 	const classTypeId = await getClassTypeId(classType);
@@ -47,6 +48,8 @@ async function createNewClass(
 		throw sameClassNameError();
 	}
 
+	await teacherCheck(ownerId);
+
 	const startDateFormatted = new Date(startDate);
 	const endDateFormatted = new Date(endDate);
 	const newClass = await classroomRepository.postNewClass(
@@ -54,7 +57,8 @@ async function createNewClass(
 		startDateFormatted,
 		endDateFormatted,
 		classCode,
-		classTypeId
+		classTypeId,
+		ownerId
 	);
 
 	return newClass;
@@ -185,6 +189,17 @@ async function getCompleteClassInfo(classId: number) {
 	return formattedClassInfo;
 }
 
+async function getOwnerInfo(classId: number) {
+	const ownerInfo = await classroomRepository.getOwnerInfo(classId);
+	const selectedInfo = {
+		id: ownerInfo.id,
+		name: ownerInfo.name,
+		email: ownerInfo.email,
+	};
+
+	return selectedInfo;
+}
+
 export const classroomService = {
 	getAllClasses,
 	teacherCheck,
@@ -192,4 +207,5 @@ export const classroomService = {
 	enrollStudent,
 	getClassesByIdList,
 	getCompleteClassInfo,
+	getOwnerInfo
 };

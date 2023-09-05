@@ -22,13 +22,14 @@ export async function getAllClasses(req: AuthenticatedRequest, res: Response) {
 
 export async function postClass(req: AuthenticatedRequest, res: Response) {
 	// className, startDate, endDate,classCode, backgroundColor, classTypeId
-	const { name, startDate, endDate, classType } = req.body;
+	const { name, startDate, endDate, classType, ownerId } = req.body;
 	try {
 		const newClass = await classroomService.createNewClass(
 			name,
 			startDate,
 			endDate,
-			classType
+			classType,
+			ownerId
 		);
 		return res.status(201).send(newClass);
 	} catch (err) {
@@ -37,6 +38,9 @@ export async function postClass(req: AuthenticatedRequest, res: Response) {
 			return res.status(err.status).send(err.message);
 		}
 		if (err.name === "Front-End Bad Request Error") {
+			return res.status(err.status).send(err.message);
+		}
+		if (err.name === "Must Be Teacher Error") {
 			return res.status(err.status).send(err.message);
 		}
 
@@ -88,9 +92,8 @@ export async function getStudentClasses(
 		if (err.name === "Unenrolled Student Error") {
 			return res.status(err.status).send(err.message);
 		}
+		return res.status(500).send(err);
 	}
-
-	return res.status(200);
 }
 
 export async function getSingleClassInfo(
@@ -112,6 +115,6 @@ export async function getSingleClassInfo(
 		);
 		return res.status(200).send(classInfo);
 	} catch (err) {
-		console.log(err);
+		return res.status(500).send(err);
 	}
 }
