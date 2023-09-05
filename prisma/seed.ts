@@ -15,7 +15,7 @@ async function main() {
 
 	const classesTypes = ["MANDATORY_INTERNSHIP", "REC"];
 
-	// const companyNames = ["Higor LTDA.", "Faria S.A."];
+	
 
 	reportStatuses.forEach(async (reportStatus) => {
 		const report_event = await prisma.report_status.findFirst({
