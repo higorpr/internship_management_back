@@ -7,7 +7,6 @@ export async function signUp(req: Request, res: Response) {
 		await authService.createUser(name, email, password);
 		return res.sendStatus(201);
 	} catch (err) {
-		console.log(err);
 		if (err.name === "Duplicated Email Error") {
 			return res.status(401).send(err.message);
 		}

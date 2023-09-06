@@ -33,7 +33,6 @@ export async function postClass(req: AuthenticatedRequest, res: Response) {
 		);
 		return res.status(201).send(newClass);
 	} catch (err) {
-		console.log(err);
 		if (err.name === "Same Class Name Error") {
 			return res.status(err.status).send(err.message);
 		}

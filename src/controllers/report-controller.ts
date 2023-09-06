@@ -76,7 +76,6 @@ export async function sendReportEmail(
 		//FIXME: Why am I sending back the file?
 		return res.status(200).send(file);
 	} catch (err) {
-		console.log(err);
 		if (err.name === "Not Pdf File") {
 			return res.status(err.status).send(err.message);
 		}
