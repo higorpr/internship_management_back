@@ -27,7 +27,6 @@ export async function sendReportEmail(
 	res: Response
 ) {
 	const file = req.files[0];
-	console.log(file);
 	const { reportId, classId } = req.body;
 
 	try {
