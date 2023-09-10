@@ -107,6 +107,7 @@ export type StudentInClassData = {
 		};
 	}[];
 	internships: {
+		id: number;
 		start_date: Date;
 		weekly_hours: number;
 		companies: {
@@ -169,6 +170,7 @@ async function GetStudentClassInfo(
 					class_id: classId,
 				},
 				select: {
+					id: true,
 					start_date: true,
 					weekly_hours: true,
 					companies: {

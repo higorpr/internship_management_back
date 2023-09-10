@@ -1,7 +1,7 @@
 import { companies, internships } from "@prisma/client";
 import { internshipRepository } from "../../repositories/internship-repository";
 import dayjs from "dayjs";
-import { Dayjs } from "dayjs";
+import { InternshipNotFound } from "./errors";
 import("dayjs/locale/pt-br");
 
 async function getCompanyIdByName(
@@ -112,8 +112,25 @@ async function updateReportForInternshipCreation(
 	);
 }
 
+async function getInternshipById(internshipId: number): Promise<internships> {
+	const IntIdObj = await internshipRepository.getInternshipById(internshipId);
+	if (!IntIdObj) {
+		throw InternshipNotFound();
+	}
+	return IntIdObj;
+}
+
+async function deleteInternship(internshipId: number) {
+	const deletedInternship = await internshipRepository.deleteInternship(
+		internshipId
+	);
+	return deletedInternship;
+}
+
 export const internshipService = {
 	postInternship,
 	updateReportForInternshipCreation,
 	generateDueDates,
+	getInternshipById,
+	deleteInternship,
 };

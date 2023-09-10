@@ -39,3 +39,32 @@ export async function createInternship(
 		return res.status(500).send(err);
 	}
 }
+
+export async function deleteInternship(
+	req: AuthenticatedRequest,
+	res: Response
+) {
+	const { internshipId } = req.params;
+
+	try {
+		// Check if internshipId exists in database
+		await internshipService.getInternshipById(Number(internshipId));
+
+		// Revert reports linked to the internshipId to initial state (when student enrolls into a class)
+
+		await reportService.revertReportsToInitalState(Number(internshipId));
+
+		// Delete internship
+		const deletedInternship = await internshipService.deleteInternship(
+			Number(internshipId)
+		);
+
+		return res.status(200).send(deletedInternship);
+	} catch (err) {
+		console.log(err);
+		if (err.name === "Internship Not Found") {
+			return res.status(err.status).send(err.message);
+		}
+		return res.status(500).send(err);
+	}
+}

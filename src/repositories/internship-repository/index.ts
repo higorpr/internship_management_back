@@ -1,4 +1,4 @@
-import { companies, internships, report_status, reports } from "@prisma/client";
+import { companies, internships, report_status } from "@prisma/client";
 import { prisma } from "../../config/db";
 
 async function createInternship(
@@ -85,9 +85,27 @@ async function updateReportsForInternshipCreation(
 	}
 }
 
+async function getInternshipById(internshipId: number): Promise<internships> {
+	return await prisma.internships.findFirst({
+		where: {
+			id: internshipId,
+		},
+	});
+}
+
+async function deleteInternship(internshipId: number): Promise<internships> {
+	return prisma.internships.delete({
+		where: {
+			id: internshipId,
+		},
+	});
+}
+
 export const internshipRepository = {
 	createInternship,
 	createCompany,
 	getCompanyByName,
 	updateReportsForInternshipCreation,
+	getInternshipById,
+	deleteInternship,
 };

@@ -85,9 +85,10 @@ function formatStudentClassData(unformattedData: StudentInClassData) {
 		className: unformattedData.user_class[0].classes.name,
 	};
 
-	let internShipData = {};
+	let internshipData = null;
 	if (unformattedData.internships.length !== 0) {
-		internShipData = {
+		internshipData = {
+			id: unformattedData.internships[0].id,
 			companyName: unformattedData.internships[0].companies.name,
 			internshipStartDate: unformattedData.internships[0].start_date,
 			weeklyHours: unformattedData.internships[0].weekly_hours,
@@ -100,7 +101,9 @@ function formatStudentClassData(unformattedData: StudentInClassData) {
 	delete formattedData.internships;
 	formattedData["studentInfo"] = userData;
 	formattedData["reportInfo"] = reportObj;
-	formattedData["internshipInfo"] = internShipData;
+	if (internshipData) {
+		formattedData["internshipInfo"] = internshipData;
+	}
 
 	return formattedData;
 }

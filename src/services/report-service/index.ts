@@ -116,6 +116,22 @@ function checkReportFileType(reportFile: Express.Multer.File): void {
 	}
 }
 
+async function revertReportsToInitalState(internshipId: number) {
+	const reportsObj = await reportRepository.getReportByInternshipId(
+		internshipId
+	);
+
+	const reportIds: number[] = [];
+	for (let i = 0; i < reportsObj.length; i++) {
+		reportIds.push(reportsObj[i].id);
+	}
+
+	const updatedReports = await reportRepository.revertReportsToInitalState(
+		reportIds
+	);
+	return updatedReports;
+}
+
 export const reportService = {
 	createInitialReports,
 	sendReportByEmail,
@@ -126,4 +142,5 @@ export const reportService = {
 	getReportInfo,
 	updateReportDeliveryInformation,
 	checkReportFileType,
+	revertReportsToInitalState,
 };

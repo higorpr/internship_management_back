@@ -1,4 +1,4 @@
-import { reports } from "@prisma/client";
+import { Prisma, reports } from "@prisma/client";
 import { prisma } from "../../config/db";
 
 async function createInitialReport(
@@ -19,6 +19,28 @@ async function createInitialReport(
 			is_delivered: false,
 			report_number: reportOrder,
 			status_id: TBDStatusId,
+			last_version_sent: 0,
+		},
+	});
+}
+
+async function revertReportsToInitalState(reportIds: number[]) {
+	const TBDStatus = await prisma.report_status.findFirst({
+		where: {
+			name: "TBD",
+		},
+	});
+	const TBDStatusId = TBDStatus.id;
+	return await prisma.reports.updateMany({
+		where: {
+			id: { in: reportIds },
+		},
+		data: {
+			is_delivered: false,
+			internship_id: null,
+			status_id: TBDStatusId,
+			delivery_date: null,
+			due_date: null,
 			last_version_sent: 0,
 		},
 	});
@@ -118,6 +140,16 @@ async function getReportStatusId(
 	});
 }
 
+async function getReportByInternshipId(
+	internshipId: number
+): Promise<reports[]> {
+	return await prisma.reports.findMany({
+		where: {
+			internship_id: internshipId,
+		},
+	});
+}
+
 export const reportRepository = {
 	createInitialReport,
 	updateReportStatus,
@@ -125,4 +157,6 @@ export const reportRepository = {
 	getReportInfo,
 	updateReportDeliveryInformation,
 	getReportStatusId,
+	getReportByInternshipId,
+	revertReportsToInitalState,
 };
