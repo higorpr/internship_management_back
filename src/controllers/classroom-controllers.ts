@@ -9,7 +9,7 @@ export async function getAllClasses(req: AuthenticatedRequest, res: Response) {
 	try {
 		await classroomService.teacherCheck(userId);
 
-		const classes = await classroomService.getAllClasses();
+		const classes = await classroomService.getAllClasses(Number(userId));
 
 		res.status(200).send(classes);
 	} catch (err) {

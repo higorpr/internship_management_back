@@ -2,6 +2,7 @@ import { AuthenticatedRequest } from "../middleware/auth-middleware";
 import { Response } from "express";
 import { internshipService } from "../services/internship-service";
 import { reportService } from "../services/report-service";
+import { userService } from "../services/user-service";
 
 export async function createInternship(
 	req: AuthenticatedRequest,
@@ -54,7 +55,7 @@ export async function deleteInternship(
 
 		await reportService.revertReportsToInitalState(Number(internshipId));
 
-		// Delete internship
+		// // Delete internship
 		const deletedInternship = await internshipService.deleteInternship(
 			Number(internshipId)
 		);

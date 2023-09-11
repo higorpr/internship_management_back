@@ -8,8 +8,8 @@ import { authentication } from "../middleware/auth-middleware";
 const internshipRouter = Router();
 
 internshipRouter
-	.delete("/delete/:internshipId", deleteInternship)
 	.all("/*", authentication)
-	.post("/newInternship", createInternship);
+	.post("/newInternship", createInternship)
+	.delete("/delete/:internshipId", deleteInternship);
 
 export { internshipRouter };

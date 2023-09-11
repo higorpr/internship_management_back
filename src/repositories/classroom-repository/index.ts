@@ -3,8 +3,8 @@ import { classes, class_type, users } from "@prisma/client";
 
 type UserType = { user_types: { name: string } };
 
-async function getAllClasses(): Promise<classes[]> {
-	return await prisma.classes.findMany();
+async function getAllClasses(ownerId: number): Promise<classes[]> {
+	return await prisma.classes.findMany({ where: { owner_id: ownerId } });
 }
 
 async function getUserType(userId: number): Promise<UserType> {
@@ -166,7 +166,7 @@ async function getOwnerInfo(classId: number): Promise<users> {
 	const ownerInfo = await prisma.users.findFirst({
 		where: { id: ownerId },
 	});
-	return ownerInfo
+	return ownerInfo;
 }
 
 export const classroomRepository = {
@@ -178,5 +178,5 @@ export const classroomRepository = {
 	getClassByCode,
 	getStudentClassesInfo,
 	getCompleteClassInfo,
-	getOwnerInfo
+	getOwnerInfo,
 };

@@ -99,6 +99,7 @@ function formatStudentClassData(unformattedData: StudentInClassData) {
 	delete formattedData.name;
 	delete formattedData.user_class;
 	delete formattedData.internships;
+
 	formattedData["studentInfo"] = userData;
 	formattedData["reportInfo"] = reportObj;
 	if (internshipData) {

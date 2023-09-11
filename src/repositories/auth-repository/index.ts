@@ -7,7 +7,6 @@ export type UserReturn = {
 	email: string;
 	password: string;
 	user_types: user_types;
-	documentation_ok: boolean;
 };
 
 async function getUserByEmail(email: string): Promise<UserReturn> {
@@ -21,7 +20,6 @@ async function getUserByEmail(email: string): Promise<UserReturn> {
 			email: true,
 			password: true,
 			user_types: true,
-			documentation_ok: true,
 		},
 	});
 }

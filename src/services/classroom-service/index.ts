@@ -16,8 +16,8 @@ import {
 	studentAlreadyEnrolledError,
 } from "./errors";
 
-async function getAllClasses(): Promise<classes[]> {
-	const allClasses = await classroomRepository.getAllClasses();
+async function getAllClasses(ownerId:number): Promise<classes[]> {
+	const allClasses = await classroomRepository.getAllClasses(ownerId);
 	return allClasses;
 }
 
