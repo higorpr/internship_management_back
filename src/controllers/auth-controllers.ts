@@ -1,5 +1,6 @@
 import { Response, Request } from "express";
 import { authService } from "../services/auth-service";
+import { isArgumentsObject } from "util/types";
 
 export async function signUp(req: Request, res: Response) {
 	const { name, email, password } = req.body;
@@ -52,16 +53,34 @@ export async function requestPasswordChange(req: Request, res: Response) {
 	try {
 		// Verificar se o usuário existe a partir do email (e pegar o userId)
 		const user = await authService.getUserByEmail(email);
-		console.log(user);
 
 		// Existindo o usuário, enviar o email com o link para alteração de senha.
 		await authService.sendNewPasswordLink(user);
 		return res.sendStatus(200);
 	} catch (err) {
-		console.log(err);
 		if (err.name === "User Not Registered Error") {
 			return res.status(err.status).send(err.message);
 		}
+		return res.status(500).send(err);
+	}
+}
+
+export async function updatePassword(req: Request, res: Response) {
+	const { token, password } = req.body;
+	try {
+		const userId = await authService.getUserIdFromtoken(token);
+
+		await authService.updatePassword(userId, password);
+
+		return res.status(202).send('Senha alterada');
+	} catch (err) {
+		if (err.name === "Wrong URL Error") {
+			return res.status(err.status).send(err.message);
+		}
+		if (err.name === "TokenExpiredError") {
+			return res.status(401).send("A URL não é mais válida");
+		}
+
 		return res.status(500).send(err);
 	}
 }

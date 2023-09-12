@@ -18,25 +18,32 @@ export function invalidLoginInfoError(): ApplicationError {
 
 export function wrongConfirmationCodeError(): ApplicationError {
 	return {
-		name: 'Wrong Confirmation Code Error',
-		message: 'O código de confirmação está incorreto',
-		status: 401
-	}
+		name: "Wrong Confirmation Code Error",
+		message: "O código de confirmação está incorreto",
+		status: 401,
+	};
 }
 
 export function alreadyConfirmedEmailError(): ApplicationError {
 	return {
-		name: 'Already Confirmed Email Error',
-		message: 'Esse e-mail já foi confirmado',
-		status: 409
-	}
+		name: "Already Confirmed Email Error",
+		message: "Esse e-mail já foi confirmado",
+		status: 409,
+	};
 }
 
 export function userNotRegisteredError(): ApplicationError {
 	return {
-		name: 'User Not Registered Error',
-		message: 'Esse usuário não consta no banco de dados',
-		status: 404
-	}
+		name: "User Not Registered Error",
+		message: "Esse usuário não consta no banco de dados",
+		status: 404,
+	};
 }
 
+export function WrongUrlError(): ApplicationError {
+	return {
+		name: "Wrong URL Error",
+		message: "Esta URL não é válida",
+		status: 401,
+	};
+}

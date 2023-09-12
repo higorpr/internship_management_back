@@ -117,6 +117,20 @@ async function getUserConfirmationCodeByEmail(email: string): Promise<{
 	});
 }
 
+async function updatePassword(
+	userId: number,
+	hashPassword: string
+): Promise<users> {
+	return await prisma.users.update({
+		where: {
+			id: userId,
+		},
+		data: {
+			password: hashPassword,
+		},
+	});
+}
+
 const authRepository = {
 	getUserByEmail,
 	createNewUser,
@@ -125,6 +139,7 @@ const authRepository = {
 	getUsermailConfirmationInfo,
 	confirmValidEmail,
 	getUserConfirmationCodeByEmail,
+	updatePassword,
 };
 
 export default authRepository;

@@ -61,7 +61,6 @@ export async function deleteInternship(
 
 		return res.status(200).send(deletedInternship);
 	} catch (err) {
-		console.log(err);
 		if (err.name === "Internship Not Found") {
 			return res.status(err.status).send(err.message);
 		}

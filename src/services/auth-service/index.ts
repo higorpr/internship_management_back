@@ -2,6 +2,7 @@ import { usermail_confirmation, users } from "@prisma/client";
 import jwt from "jsonwebtoken";
 import authRepository, { UserReturn } from "../../repositories/auth-repository";
 import {
+	WrongUrlError,
 	alreadyConfirmedEmailError,
 	duplicatedEmailError,
 	invalidLoginInfoError,
@@ -11,6 +12,7 @@ import {
 import bcrypt from "bcrypt";
 import { customAlphabet } from "nanoid";
 import sgMail from "@sendgrid/mail";
+import { JWTPayload } from "middleware/auth-middleware";
 
 async function createUser(
 	name: string,
@@ -193,6 +195,7 @@ async function sendNewPasswordLink(user: UserReturn) {
 	sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 	const domain = process.env.DOMAIN;
+
 	const token = createSession(user.id);
 	const subject =
 		"Redefinição de Senha - Plataforma de Controle de Relatórios de Estágio";
@@ -217,6 +220,22 @@ async function sendNewPasswordLink(user: UserReturn) {
 	return mail;
 }
 
+async function getUserIdFromtoken(token: string) {
+	const { userId } = jwt.verify(token, process.env.JWT_SECRET) as JWTPayload;
+
+	if (!userId) {
+		throw WrongUrlError();
+	}
+
+	return userId;
+}
+
+async function updatePassword(userId: number, password: string) {
+	const hashPassword = await bcrypt.hash(password, 12);
+
+	return await authRepository.updatePassword(userId, hashPassword);
+}
+
 export const authService = {
 	createUser,
 	login,
@@ -226,4 +245,6 @@ export const authService = {
 	getConfirmationCode,
 	getUserByEmail,
 	sendNewPasswordLink,
+	getUserIdFromtoken,
+	updatePassword,
 };
