@@ -35,7 +35,7 @@ export function alreadyConfirmedEmailError(): ApplicationError {
 export function userNotRegisteredError(): ApplicationError {
 	return {
 		name: 'User Not Registered Error',
-		message: 'Esse usuário não consta nos registros',
+		message: 'Esse usuário não consta no banco de dados',
 		status: 404
 	}
 }

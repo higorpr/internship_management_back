@@ -181,6 +181,41 @@ async function getConfirmationCode(email: string): Promise<{
 	return await authRepository.getUserConfirmationCodeByEmail(email);
 }
 
+async function getUserByEmail(email: string) {
+	const user = await getUserInfoByEmail(email);
+	if (!user) {
+		throw userNotRegisteredError();
+	}
+	return user;
+}
+
+async function sendNewPasswordLink(user: UserReturn) {
+	sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+
+	const token = createSession(user.id);
+	const subject =
+		"Redefinição de Senha - Plataforma de Controle de Relatórios de Estágio";
+
+	const htmlContent = `
+	<h1>Pedido de Alteração de Senha</h1>
+	<p>Foi requisitada a alteração da senha de acesso do usuário ${user.name}.</p> 
+	<p>Para alterar a senha, acesso o <a href="https://plataformadeestagio.vercel.app/newpassword/${token}">link</a>,
+	que tem validade de 1 (um) dia</p>
+	<p>Caso não tenha sido você a requisitar essa mudança de senha, por favor ignore esse e-mail.</p>
+	`;
+
+	const email = {
+		to: user.email,
+		from: process.env.FROM_EMAIL,
+		subject: subject,
+		html: htmlContent,
+	};
+
+	const mail = await sgMail.send(email);
+
+	return mail;
+}
+
 export const authService = {
 	createUser,
 	login,
@@ -188,4 +223,6 @@ export const authService = {
 	isValidatedEmail,
 	sendConfirmationCodeEmail,
 	getConfirmationCode,
+	getUserByEmail,
+	sendNewPasswordLink,
 };
