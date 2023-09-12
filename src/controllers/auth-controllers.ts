@@ -49,15 +49,14 @@ export async function validateUserEmail(req: Request, res: Response) {
 
 export async function requestPasswordChange(req: Request, res: Response) {
 	const { email }: { email: string } = req.body;
-	console.log(email)
 	try {
 		// Verificar se o usuário existe a partir do email (e pegar o userId)
 		const user = await authService.getUserByEmail(email);
 		console.log(user);
 
 		// Existindo o usuário, enviar o email com o link para alteração de senha.
-		const sentEmail = await authService.sendNewPasswordLink(user);
-		return res.status(200).send(sentEmail);
+		await authService.sendNewPasswordLink(user);
+		return res.sendStatus(200);
 	} catch (err) {
 		console.log(err);
 		if (err.name === "User Not Registered Error") {
