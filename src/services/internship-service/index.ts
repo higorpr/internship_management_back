@@ -136,12 +136,11 @@ async function checkInternshipStartDate(
 	const classStartDate = classObj.start_date;
 
 	if (classStartDate.getTime() > internshipStartDate.getTime()) {
-		const onlyDate = classStartDate
-			.toLocaleString("pt-BR", {
-				timeZone: "America/Sao_Paulo",
-			})
-			.split(",")[0];
-		console.log(onlyDate);
+		const day = classStartDate.getDate();
+		const month = classStartDate.getMonth() + 1;
+		const year = classStartDate.getFullYear();		
+		const onlyDate = `${day}/${month}/${year}`;
+
 		throw EarlyInternshipError(onlyDate);
 	}
 }
