@@ -141,6 +141,7 @@ async function checkInternshipStartDate(
 				timeZone: "America/Sao_Paulo",
 			})
 			.split(",")[0];
+		console.log(onlyDate);
 		throw EarlyInternshipError(onlyDate);
 	}
 }
