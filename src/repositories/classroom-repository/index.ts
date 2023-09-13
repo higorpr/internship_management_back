@@ -169,6 +169,14 @@ async function getOwnerInfo(classId: number): Promise<users> {
 	return ownerInfo;
 }
 
+async function getClassById(classId: number): Promise<classes> {
+	return await prisma.classes.findFirst({
+		where: {
+			id: classId,
+		},
+	});
+}
+
 export const classroomRepository = {
 	getAllClasses,
 	getUserType,
@@ -179,4 +187,5 @@ export const classroomRepository = {
 	getStudentClassesInfo,
 	getCompleteClassInfo,
 	getOwnerInfo,
+	getClassById
 };

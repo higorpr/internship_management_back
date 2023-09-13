@@ -16,6 +16,11 @@ export async function createInternship(
 	try {
 		const formattedStartDate = new Date(startDateWithTimezone);
 
+		await internshipService.checkInternshipStartDate(
+			Number(classId),
+			formattedStartDate
+		);
+
 		const internship = await internshipService.postInternship(
 			companyName,
 			studentId,
@@ -36,6 +41,9 @@ export async function createInternship(
 
 		return res.status(201).send(internship);
 	} catch (err) {
+		if (err.name === "Early Internship Error") {
+			return res.status(err.status).send(err.message);
+		}
 		return res.status(500).send(err);
 	}
 }

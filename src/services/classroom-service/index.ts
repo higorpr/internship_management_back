@@ -16,7 +16,7 @@ import {
 	studentAlreadyEnrolledError,
 } from "./errors";
 
-async function getAllClasses(ownerId:number): Promise<classes[]> {
+async function getAllClasses(ownerId: number): Promise<classes[]> {
 	const allClasses = await classroomRepository.getAllClasses(ownerId);
 	return allClasses;
 }
@@ -145,6 +145,10 @@ async function getClassesByIdList(idList: number[]): Promise<classes[]> {
 	return studentClasses;
 }
 
+async function getClassById(classId: number) {
+	return await classroomRepository.getClassById(classId);
+}
+
 function formatClassInfo(classInfo: completeClassInfo) {
 	const formattedClassInfo = { ...classInfo };
 
@@ -206,6 +210,7 @@ export const classroomService = {
 	createNewClass,
 	enrollStudent,
 	getClassesByIdList,
+	getClassById,
 	getCompleteClassInfo,
-	getOwnerInfo
+	getOwnerInfo,
 };

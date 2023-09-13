@@ -1,7 +1,8 @@
 import { companies, internships } from "@prisma/client";
 import { internshipRepository } from "../../repositories/internship-repository";
 import dayjs from "dayjs";
-import { InternshipNotFound } from "./errors";
+import { EarlyInternshipError, InternshipNotFound } from "./errors";
+import { classroomService } from "../classroom-service";
 import("dayjs/locale/pt-br");
 
 async function getCompanyIdByName(
@@ -127,10 +128,28 @@ async function deleteInternship(internshipId: number) {
 	return deletedInternship;
 }
 
+async function checkInternshipStartDate(
+	classId: number,
+	internshipStartDate: Date
+): Promise<void> {
+	const classObj = await classroomService.getClassById(Number(classId));
+	const classStartDate = classObj.start_date;
+
+	if (classStartDate.getTime() > internshipStartDate.getTime()) {
+		const onlyDate = classStartDate
+			.toLocaleString("pt-BR", {
+				timeZone: "America/Sao_Paulo",
+			})
+			.split(",")[0];
+		throw EarlyInternshipError(onlyDate);
+	}
+}
+
 export const internshipService = {
 	postInternship,
 	updateReportForInternshipCreation,
 	generateDueDates,
 	getInternshipById,
 	deleteInternship,
+	checkInternshipStartDate,
 };
