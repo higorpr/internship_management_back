@@ -204,8 +204,14 @@ async function getOwnerInfo(classId: number) {
 	return selectedInfo;
 }
 
-async function createReport(classId: number) {
+async function getReportInfo(classId: number) {
 	const reportInfo = await classroomRepository.getClassReportInfo(classId);
+	return reportInfo;
+}
+
+async function createReport(classId: number) {
+	const reportInfo = await getReportInfo(classId);
+	// add code to create spreadsheet
 	return reportInfo;
 }
 
