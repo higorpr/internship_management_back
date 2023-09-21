@@ -1,7 +1,32 @@
 import { prisma } from "../../config/db";
-import { classes, class_type, users } from "@prisma/client";
+import {
+	classes,
+	class_type,
+	users,
+	reports,
+	internships,
+} from "@prisma/client";
 
 type UserType = { user_types: { name: string } };
+
+type classReportType = {
+	user_class: {
+		users: {
+			reports: reports[];
+			name: string;
+			internships: {
+				id: number;
+				student_id: number;
+				start_date: Date;
+				weekly_hours: number;
+				class_id: number;
+				companies: {
+					name: string;
+				};
+			}[];
+		};
+	}[];
+};
 
 async function getAllClasses(ownerId: number): Promise<classes[]> {
 	return await prisma.classes.findMany({ where: { owner_id: ownerId } });
@@ -177,6 +202,50 @@ async function getClassById(classId: number): Promise<classes> {
 	});
 }
 
+async function getClassReportInfo(classId: number): Promise<classReportType> {
+	return await prisma.classes.findUnique({
+		where: {
+			id: classId,
+		},
+		select: {
+			user_class: {
+				where: {
+					class_id: classId,
+				},
+				select: {
+					users: {
+						select: {
+							name: true,
+							reports: {
+								where: {
+									class_id: classId,
+								},
+							},
+							internships: {
+								where: {
+									class_id: classId,
+								},
+								select: {
+									id: true,
+									student_id: true,
+									start_date: true,
+									weekly_hours: true,
+									class_id: true,
+									companies: {
+										select: {
+											name: true,
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	});
+}
+
 export const classroomRepository = {
 	getAllClasses,
 	getUserType,
@@ -187,5 +256,6 @@ export const classroomRepository = {
 	getStudentClassesInfo,
 	getCompleteClassInfo,
 	getOwnerInfo,
-	getClassById
+	getClassById,
+	getClassReportInfo,
 };

@@ -204,6 +204,11 @@ async function getOwnerInfo(classId: number) {
 	return selectedInfo;
 }
 
+async function createReport(classId: number) {
+	const reportInfo = await classroomRepository.getClassReportInfo(classId);
+	return reportInfo;
+}
+
 export const classroomService = {
 	getAllClasses,
 	teacherCheck,
@@ -213,4 +218,5 @@ export const classroomService = {
 	getClassById,
 	getCompleteClassInfo,
 	getOwnerInfo,
+	createReport,
 };

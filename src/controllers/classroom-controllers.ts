@@ -106,14 +106,27 @@ export async function getSingleClassInfo(
 	}
 
 	try {
-		const updatedReports = await reportService.updateReportsIfExpired(
-			Number(classId)
-		);
+		await reportService.updateReportsIfExpired(Number(classId));
 		const classInfo = await classroomService.getCompleteClassInfo(
 			Number(classId)
 		);
 		return res.status(200).send(classInfo);
 	} catch (err) {
+		return res.status(500).send(err);
+	}
+}
+
+export async function createClassReport(
+	req: AuthenticatedRequest,
+	res: Response
+) {
+	const { classId } = req.params;
+
+	try {
+		const reportInfo = await classroomService.createReport(Number(classId));
+		return res.status(200).send(reportInfo);
+	} catch (err) {
+		console.log(err);
 		return res.status(500).send(err);
 	}
 }

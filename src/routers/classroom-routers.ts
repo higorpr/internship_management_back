@@ -1,5 +1,6 @@
 import { Router } from "express";
 import {
+	createClassReport,
 	enrollNewStudent,
 	getAllClasses,
 	getSingleClassInfo,
@@ -11,6 +12,7 @@ import { authentication } from "../middleware/auth-middleware";
 const classroomRouter = Router();
 
 classroomRouter
+	.get("/classReport/:classId",createClassReport)
 	.all("/*", authentication)
 	.get("/all", getAllClasses)
 	.get("/studentClasses", getStudentClasses)
