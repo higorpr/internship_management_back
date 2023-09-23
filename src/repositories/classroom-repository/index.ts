@@ -9,25 +9,6 @@ import {
 
 type UserType = { user_types: { name: string } };
 
-type classReportType = {
-	user_class: {
-		users: {
-			reports: reports[];
-			name: string;
-			internships: {
-				id: number;
-				student_id: number;
-				start_date: Date;
-				weekly_hours: number;
-				class_id: number;
-				companies: {
-					name: string;
-				};
-			}[];
-		};
-	}[];
-};
-
 async function getAllClasses(ownerId: number): Promise<classes[]> {
 	return await prisma.classes.findMany({ where: { owner_id: ownerId } });
 }
@@ -202,6 +183,37 @@ async function getClassById(classId: number): Promise<classes> {
 	});
 }
 
+type classReportType = {
+	user_class: {
+		users: {
+			name: string;
+			reports: {
+				report_number: number;
+				report_status: {
+					name: string;
+				};
+				student_id: number;
+				class_id: number;
+				is_delivered: boolean;
+				status_id: number;
+				delivery_date: Date;
+				last_version_sent: number;
+				due_date: Date;
+			}[];
+			internships: {
+				id: number;
+				student_id: number;
+				start_date: Date;
+				weekly_hours: number;
+				class_id: number;
+				companies: {
+					name: string;
+				};
+			}[];
+		};
+	}[];
+};
+
 async function getClassReportInfo(classId: number): Promise<classReportType> {
 	return await prisma.classes.findUnique({
 		where: {
@@ -217,8 +229,26 @@ async function getClassReportInfo(classId: number): Promise<classReportType> {
 						select: {
 							name: true,
 							reports: {
+								orderBy: {
+									report_number: "asc",
+								},
 								where: {
 									class_id: classId,
+								},
+								select: {
+									student_id: true,
+									class_id: true,
+									is_delivered: true,
+									report_number: true,
+									status_id: true,
+									delivery_date: true,
+									due_date: true,
+									last_version_sent: true,
+									report_status: {
+										select: {
+											name: true,
+										},
+									},
 								},
 							},
 							internships: {

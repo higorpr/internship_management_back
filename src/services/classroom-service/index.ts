@@ -1,4 +1,4 @@
-import { classes } from "@prisma/client";
+import { classes, reports } from "@prisma/client";
 import { nanoid } from "nanoid";
 import {
 	classInfo,
@@ -15,6 +15,7 @@ import {
 	sameClassNameError,
 	studentAlreadyEnrolledError,
 } from "./errors";
+import * as XLSX from "xlsx";
 
 async function getAllClasses(ownerId: number): Promise<classes[]> {
 	const allClasses = await classroomRepository.getAllClasses(ownerId);
@@ -210,9 +211,145 @@ async function getReportInfo(classId: number) {
 }
 
 async function createReport(classId: number) {
+	// Get class report info
 	const reportInfo = await getReportInfo(classId);
-	// add code to create spreadsheet
-	return reportInfo;
+
+	// Create spreadsheet
+	const wb = XLSX.utils.book_new();
+
+	// Create array to hold sheet information
+	const sheetArray: string[][] = [];
+
+	// Generate fixed rows
+	const emptyRow = ["", "", "", "", "", "", "", "", "", "", ""];
+	const firstRow = [
+		"",
+		"SUPERVISÃO ESTÁGIO",
+		"",
+		"",
+		"",
+		"Legenda",
+		"AGUARDANDO - EM DIA",
+		"ENTREGUE",
+		"ATRASADO",
+		"APROVADO",
+		"RECUSADO",
+	];
+	const titleRow = [
+		"",
+		"Nome",
+		"Local de Estágio",
+		"Data de Início do Estágio",
+		"Horas Semanais",
+		"Data de Entrega - Relatório 1",
+		"Status",
+		"Data de Entrega - Relatório 2",
+		"Status",
+		"Data de Entrega - Relatório 3",
+		"Status",
+	];
+
+	// Push fixed rows to sheet array
+	sheetArray.push(firstRow);
+	sheetArray.push(emptyRow);
+	sheetArray.push(titleRow);
+
+	// Get users in reportInfo
+	const usersList = reportInfo.user_class;
+	usersList.map((user, idx) => {
+		const userRow = generateUserRow(user.users, idx + 1);
+		sheetArray.push(userRow);
+	});
+
+	const ws = XLSX.utils.aoa_to_sheet(sheetArray);
+
+	const sheetBook = XLSX.utils.book_append_sheet(
+		wb,
+		ws,
+		"Estágio Controle Datas"
+	);
+
+	console.log(wb);
+
+	// XLSX.writeFile(wb, "Estágio_Status Relatórios.xlsx");
+
+	return wb;
+}
+
+type ReportUserInfo = {
+	reports: {
+		report_number: number;
+		report_status: {
+			name: string;
+		};
+		student_id: number;
+		class_id: number;
+		is_delivered: boolean;
+		status_id: number;
+		delivery_date: Date;
+		last_version_sent: number;
+		due_date: Date;
+	}[];
+	name: string;
+	internships: {
+		id: number;
+		student_id: number;
+		start_date: Date;
+		weekly_hours: number;
+		class_id: number;
+		companies: {
+			name: string;
+		};
+	}[];
+};
+
+function generateUserRow(user: ReportUserInfo, index: number) {
+	const row = ["", "", "", "", "", "", "", "", "", "", "", "", "", ""];
+	row[0] = index.toString();
+	row[1] = user.name;
+
+	if (user.internships.length !== 0) {
+		row[2] = user.internships[0].companies.name;
+		row[3] = user.internships[0].start_date.toLocaleDateString("pt-BR");
+		row[4] = `${user.internships[0].weekly_hours}h`;
+	} else {
+		row[2] = "SEM ESTÁGIO";
+		row[3] = "SEM ESTÁGIO";
+		row[4] = "SEM ESTÁGIO";
+	}
+	row[5] = user.reports[0].delivery_date
+		? user.reports[0].delivery_date.toLocaleDateString("pt-BR")
+		: "N/A";
+	row[6] = portugueseReportStatus(user.reports[0].report_status.name);
+
+	row[7] = user.reports[1].delivery_date
+		? user.reports[1].delivery_date.toLocaleDateString("pt-BR")
+		: "N/A";
+	row[8] = portugueseReportStatus(user.reports[0].report_status.name);
+
+	row[9] = user.reports[2].delivery_date
+		? user.reports[2].delivery_date.toLocaleDateString("pt-BR")
+		: "N/A";
+	row[10] = portugueseReportStatus(user.reports[0].report_status.name);
+
+	return row;
+}
+
+function portugueseReportStatus(status: string) {
+	switch (status) {
+		case "WAITING":
+			return "AGUARDANDO - EM DIA";
+		case "ACCEPTED":
+			return "APROVADO";
+		case "REFUSED":
+			return "REPROVADO";
+		case "LATE":
+			return "ATRASADO";
+		case "DELIVERED":
+			return "ENTREGUE";
+		default:
+			return "ASD";
+	}
 }
 
 export const classroomService = {
