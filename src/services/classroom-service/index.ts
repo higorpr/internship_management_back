@@ -183,7 +183,31 @@ function formatClassInfo(classInfo: completeClassInfo) {
 
 	delete formattedClassInfo.user_class;
 	formattedClassInfo["students"] = studentReportInfo;
+	// formattedClassInfo["students"].sort((a, b) =>
+	// 	a.studentName.localCompare(b.studentName)
+	// );
+
+	formattedClassInfo["students"] = sortStringList(
+		formattedClassInfo["students"],
+		"studentName"
+	);
 	return formattedClassInfo;
+}
+
+function sortStringList(strList: string[], field: string): string[] {
+	strList.sort((a, b) => {
+		const fa = a[field].toLowerCase();
+		const fb = b[field].toLowerCase();
+
+		if (fa < fb) {
+			return -1;
+		}
+		if (fa > fb) {
+			return 1;
+		}
+		return 0;
+	});
+	return strList;
 }
 
 async function getCompleteClassInfo(classId: number) {
