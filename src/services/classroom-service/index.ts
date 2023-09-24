@@ -287,8 +287,6 @@ async function createReport(classId: number) {
 
 	XLSX.utils.book_append_sheet(wb, ws, "Estágio Controle Datas");
 
-	console.log(wb);
-
 	return wb;
 }
 
