@@ -159,12 +159,12 @@ async function sendConfirmationCodeEmail(
 ) {
 	sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
-	const content = `Seu código de acesso à Plataforma de Controle de Relatórios de Estágio é: ${confirmationCode} `;
+	const content = `Seu código de acesso à Plataforma de Controle de Estágio de Estágio é: ${confirmationCode} `;
 
 	const email = {
 		to: useremail,
 		from: process.env.FROM_EMAIL,
-		subject: "Plataforma de Controle de Relatórios - Código de Acesso",
+		subject: "Plataforma de Controle de Estágio - Código de Acesso",
 		text: content,
 	};
 
@@ -197,13 +197,12 @@ async function sendNewPasswordLink(user: UserReturn) {
 	const domain = process.env.DOMAIN;
 
 	const token = createSession(user.id);
-	const subject =
-		"Redefinição de Senha - Plataforma de Controle de Relatórios de Estágio";
+	const subject = "Redefinição de Senha - Plataforma de Controle de Estágio";
 
 	const htmlContent = `
 	<h1>Pedido de Alteração de Senha</h1>
 	<p>Foi requisitada a alteração da senha de acesso do usuário ${user.name}.</p> 
-	<p>Para alterar a senha, acesso o <a href="${domain}/newpassword/${token}">link</a>,
+	<p>Para alterar a senha, acesse o <a href="${domain}/newpassword/${token}">link</a>,
 	que tem validade de 1 (um) dia</p>
 	<p>Caso não tenha sido você a requisitar essa mudança de senha, por favor ignore esse e-mail.</p>
 	`;

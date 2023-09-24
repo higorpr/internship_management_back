@@ -245,13 +245,9 @@ async function createReport(classId: number) {
 	const sheetArray: string[][] = [];
 
 	// Generate fixed rows
-	const emptyRow = ["", "", "", "", "", "", "", "", "", "", ""];
+	const emptyRow = [""];
 	const firstRow = [
-		"",
 		"SUPERVISÃO ESTÁGIO",
-		"",
-		"",
-		"",
 		"Legenda",
 		"AGUARDANDO - EM DIA",
 		"ENTREGUE",
@@ -260,16 +256,18 @@ async function createReport(classId: number) {
 		"RECUSADO",
 	];
 	const titleRow = [
-		"",
 		"Nome",
 		"Local de Estágio",
 		"Data de Início do Estágio",
 		"Horas Semanais",
-		"Data de Entrega - Relatório 1",
+		"Data Prevista - Relatório 1",
+		"Entrega Efetiva - Relatório 1",
 		"Status",
-		"Data de Entrega - Relatório 2",
+		"Data Prevista - Relatório 2",
+		"Entrega Efetiva - Relatório 2",
 		"Status",
-		"Data de Entrega - Relatório 3",
+		"Data Prevista - Relatório 3",
+		"Entrega Efetiva - Relatório 3",
 		"Status",
 	];
 
@@ -280,22 +278,16 @@ async function createReport(classId: number) {
 
 	// Get users in reportInfo
 	const usersList = reportInfo.user_class;
-	usersList.map((user, idx) => {
-		const userRow = generateUserRow(user.users, idx + 1);
+	usersList.map((user) => {
+		const userRow = generateUserRow(user.users);
 		sheetArray.push(userRow);
 	});
 
 	const ws = XLSX.utils.aoa_to_sheet(sheetArray);
 
-	const sheetBook = XLSX.utils.book_append_sheet(
-		wb,
-		ws,
-		"Estágio Controle Datas"
-	);
+	XLSX.utils.book_append_sheet(wb, ws, "Estágio Controle Datas");
 
 	console.log(wb);
-
-	// XLSX.writeFile(wb, "Estágio_Status Relatórios.xlsx");
 
 	return wb;
 }
@@ -327,34 +319,42 @@ type ReportUserInfo = {
 	}[];
 };
 
-function generateUserRow(user: ReportUserInfo, index: number) {
-	const row = ["", "", "", "", "", "", "", "", "", "", "", "", "", ""];
-	row[0] = index.toString();
-	row[1] = user.name;
+function generateUserRow(user: ReportUserInfo) {
+	const row = ["", "", "", "", "", "", "", "", "", "", "", "", ""];
+	row[0] = user.name;
 
 	if (user.internships.length !== 0) {
-		row[2] = user.internships[0].companies.name;
-		row[3] = user.internships[0].start_date.toLocaleDateString("pt-BR");
-		row[4] = `${user.internships[0].weekly_hours}h`;
+		row[1] = user.internships[0].companies.name;
+		row[2] = user.internships[0].start_date.toLocaleDateString("pt-BR");
+		row[3] = `${user.internships[0].weekly_hours}h`;
 	} else {
+		row[1] = "SEM ESTÁGIO";
 		row[2] = "SEM ESTÁGIO";
 		row[3] = "SEM ESTÁGIO";
-		row[4] = "SEM ESTÁGIO";
 	}
+	row[4] = user.reports[0].due_date
+		? user.reports[0].due_date.toLocaleDateString("pt-BR")
+		: "";
 	row[5] = user.reports[0].delivery_date
 		? user.reports[0].delivery_date.toLocaleDateString("pt-BR")
-		: "N/A";
+		: "";
 	row[6] = portugueseReportStatus(user.reports[0].report_status.name);
 
-	row[7] = user.reports[1].delivery_date
+	row[7] = user.reports[1].due_date
+		? user.reports[1].due_date.toLocaleDateString("pt-BR")
+		: "";
+	row[8] = user.reports[1].delivery_date
 		? user.reports[1].delivery_date.toLocaleDateString("pt-BR")
-		: "N/A";
-	row[8] = portugueseReportStatus(user.reports[0].report_status.name);
+		: "";
+	row[9] = portugueseReportStatus(user.reports[1].report_status.name);
 
-	row[9] = user.reports[2].delivery_date
+	row[10] = user.reports[2].due_date
+		? user.reports[2].due_date.toLocaleDateString("pt-BR")
+		: "";
+	row[11] = user.reports[2].delivery_date
 		? user.reports[2].delivery_date.toLocaleDateString("pt-BR")
-		: "N/A";
-	row[10] = portugueseReportStatus(user.reports[0].report_status.name);
+		: "";
+	row[12] = portugueseReportStatus(user.reports[2].report_status.name);
 
 	return row;
 }
@@ -372,7 +372,7 @@ function portugueseReportStatus(status: string) {
 		case "DELIVERED":
 			return "ENTREGUE";
 		default:
-			return "ASD";
+			return "SEM ESTÁGIO";
 	}
 }
 

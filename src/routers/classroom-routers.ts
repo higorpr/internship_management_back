@@ -1,6 +1,6 @@
 import { Router } from "express";
 import {
-	createClassReport,
+	sendClassReportInfo,
 	enrollNewStudent,
 	getAllClasses,
 	getSingleClassInfo,
@@ -12,11 +12,11 @@ import { authentication } from "../middleware/auth-middleware";
 const classroomRouter = Router();
 
 classroomRouter
-	.get("/classReport/:classId",createClassReport)
 	.all("/*", authentication)
 	.get("/all", getAllClasses)
 	.get("/studentClasses", getStudentClasses)
 	.get("/singleClassInfo/:classId", getSingleClassInfo)
+	.get("/classReport/:classId", sendClassReportInfo)
 	.post("/new", postClass)
 	.post("/newStudent", enrollNewStudent);
 

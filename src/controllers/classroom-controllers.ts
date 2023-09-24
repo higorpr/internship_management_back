@@ -116,7 +116,7 @@ export async function getSingleClassInfo(
 	}
 }
 
-export async function createClassReport(
+export async function sendClassReportInfo(
 	req: AuthenticatedRequest,
 	res: Response
 ) {
@@ -124,7 +124,11 @@ export async function createClassReport(
 
 	try {
 		const reportInfo = await classroomService.createReport(Number(classId));
-		return res.status(200).send(reportInfo);
+		const classInfo = await classroomService.getClassById(Number(classId));
+
+		return res
+			.status(200)
+			.send({ reportInfo: reportInfo, className: classInfo.name });
 	} catch (err) {
 		console.log(err);
 		return res.status(500).send(err);

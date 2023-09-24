@@ -1,7 +1,5 @@
 import { reports } from "@prisma/client";
 import { reportRepository } from "../../repositories/report-repository";
-import fs from "fs";
-import path from "path";
 import sgMail from "@sendgrid/mail";
 import { AttachmentData } from "@sendgrid/helpers/classes/attachment";
 import { MailDataRequired } from "@sendgrid/mail";
@@ -26,6 +24,46 @@ async function createInitialReports(
 	}
 
 	return initialReports;
+}
+
+async function sendUpdatedReportEmail(reportId: number) {
+	// Enviar e-mail para aluno após relatório ser atualizado.
+	// Informações no e-mail:
+	// {student_name}, seu relatório {num_report} foi {report_state}.
+	// Caso tenha alguma dúvida, entre em contato pelo e-mail {e-mail professora}
+	// Este é um e-mail automático, favor não responder.
+	// Atenciosamente,
+	// Plataforma de Relatórios de Estágio
+
+	// Get basic info
+	const reportInfo = await reportRepository.getReportEmailInfo(reportId);
+	let ptReportState;
+	if (reportInfo.reportState === "ACCEPTED") {
+		ptReportState = "Aceito";
+	} else {
+		ptReportState = "Recusado";
+	}
+
+	sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+
+	const content = `Caro ${reportInfo.studentName}, \n
+	\nSeu relatório ${reportInfo.reportNumber} foi definido como ${ptReportState}.\n
+	\nCaso tenha alguma dúvida, entre em contato pelo e-mail ${reportInfo.teacherEmail}\n
+	\nEste é um e-mail automático, favor não responder.\n
+	\n Atenciosamente,
+	\nPlataforma de Controle de Estágios`;
+
+	const email = {
+		to: reportInfo.studentEmail,
+		from: process.env.FROM_EMAIL,
+		subject:
+			"Plataforma de Controle de Estágios - Confirmação de Envio de Relatório",
+		text: content,
+	};
+
+	const mail = await sgMail.send(email);
+
+	return mail;
 }
 
 async function sendReportByEmail(
@@ -58,11 +96,6 @@ async function sendReportByEmail(
 	const mail = await sgMail.send(email);
 
 	return mail;
-}
-
-function deleteFile(file: Express.Multer.File): void {
-	const dirPath = path.join(file.path);
-	fs.unlinkSync(dirPath);
 }
 
 async function updateReportStatus(
@@ -134,8 +167,8 @@ async function revertReportsToInitalState(internshipId: number) {
 
 export const reportService = {
 	createInitialReports,
+	sendUpdatedReportEmail,
 	sendReportByEmail,
-	deleteFile,
 	updateReportStatus,
 	checkIfTeacher,
 	updateReportsIfExpired,

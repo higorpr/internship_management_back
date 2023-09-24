@@ -150,6 +150,59 @@ async function getReportByInternshipId(
 	});
 }
 
+async function getReportEmailInfo(reportId: number): Promise<{
+	studentName: string;
+	studentEmail: string;
+	reportNumber: number;
+	reportState: string;
+	teacherEmail: string;
+}> {
+	const reportInfo = await prisma.reports.findFirst({
+		where: { id: reportId },
+		select: {
+			student_id: true,
+			report_number: true,
+			class_id: true,
+			report_status: {
+				select: {
+					name: true,
+				},
+			},
+		},
+	});
+	const studentInfo = await prisma.users.findUnique({
+		where: {
+			id: reportInfo.student_id,
+		},
+		select: {
+			name: true,
+			email: true,
+		},
+	});
+	const classInfo = await prisma.classes.findUnique({
+		where: {
+			id: reportInfo.class_id,
+		},
+		select: {
+			owner_id: true,
+		},
+	});
+	const teacherInfo = await prisma.users.findUnique({
+		where: { id: classInfo.owner_id },
+		select: {
+			email: true,
+		},
+	});
+
+	return {
+		studentName: studentInfo.name,
+		studentEmail: studentInfo.email,
+		reportNumber: reportInfo.report_number,
+		reportState: reportInfo.report_status.name,
+		teacherEmail: teacherInfo.email,
+	};
+}
+
 export const reportRepository = {
 	createInitialReport,
 	updateReportStatus,
@@ -159,4 +212,5 @@ export const reportRepository = {
 	getReportStatusId,
 	getReportByInternshipId,
 	revertReportsToInitalState,
+	getReportEmailInfo,
 };

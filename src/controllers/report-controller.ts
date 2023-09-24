@@ -13,6 +13,8 @@ export async function gradeReport(req: AuthenticatedRequest, res: Response) {
 			reportId,
 			reportStatus
 		);
+		await reportService.sendUpdatedReportEmail(Number(reportId));
+
 		return res.status(200).send(updatedReport);
 	} catch (err) {
 		if (err.name !== "Error") {
@@ -71,7 +73,6 @@ export async function sendReportEmail(
 				);
 			return res.status(200).send(updatedReport);
 		}
-		// return res.sendStatus(200);
 		//FIXME: Why am I sending back the file?
 		return res.status(200).send(file);
 	} catch (err) {
