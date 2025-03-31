@@ -6,11 +6,11 @@
 	"main": "index.js",
 	"scripts": {
 		"test": "jest",
-		"dev": "nodemon src/server.ts",
+		"dev": "tsx watch src/server.ts",
 		"seed": "npx prisma db seed",
 		"studio": "npx prisma studio",
 		"build": "npm install && tsc",
-		"start": "node dist/src/server.js",
+		"start": "npx tsx dist/src/server.js",
 		"db:pull": "npx prisma db pull",
 		"prisma:migration:dev": "npx prisma migrate dev",
 		"prisma:migration:deploy": "npx prisma migrate deploy"
@@ -51,8 +51,8 @@
 		"prisma": "^4.10.1",
 		"supertest": "^6.3.3",
 		"ts-jest": "^29.1.0",
-		"ts-node": "^10.9.1",
 		"tsconfig-paths": "^4.1.2",
+		"tsx": "^4.19.3",
 		"typescript": "^4.9.5",
 		"typescript-transform-paths": "^3.4.6"
 	},
