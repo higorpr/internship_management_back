@@ -3,8 +3,6 @@ import {
 	classes,
 	class_type,
 	users,
-	reports,
-	internships,
 } from "@prisma/client";
 
 type UserType = { user_types: { name: string } };

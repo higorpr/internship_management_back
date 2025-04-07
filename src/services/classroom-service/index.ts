@@ -1,4 +1,4 @@
-import { classes, reports } from "@prisma/client";
+import { classes } from "@prisma/client";
 import { nanoid } from "nanoid";
 import {
 	classInfo,

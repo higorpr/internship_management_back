@@ -1,6 +1,5 @@
 import { Response, Request } from "express";
 import { authService } from "../services/auth-service";
-import { isArgumentsObject } from "util/types";
 
 export async function signUp(req: Request, res: Response) {
 	const { name, email, password } = req.body;
